@@ -13,7 +13,7 @@ export default {
         light: {
           'background': '#f8fcff',  // Soft white-blue for a clean medical feel
           'primary': '#00bfff',     // Professional medical blue
-          'secondary': '#001824',   // Deep teal for contrast
+          'secondary': '#eff7fe',   // Deep teal for contrast
           'accent': '#00ccff',      // Vibrant cyan for highlights
           'neutral': '#f0f4f8',     // Light gray-blue for backgrounds/cards
           'base-100': '#ffffff',    // Pure white for containers
