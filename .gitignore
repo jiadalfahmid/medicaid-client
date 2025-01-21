@@ -14,8 +14,6 @@ dist-ssr
 useAdmin.jsx
 useAxiosPublic.jsx
 useAxiossecure.jsx
-login
-register
 adminrouter.jsx
 .env
 

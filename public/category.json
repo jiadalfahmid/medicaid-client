@@ -1,0 +1,23 @@
+[
+   {
+     "categoryName": "Medicine",
+     "categoryImage": "https://cdn-icons-png.flaticon.com/512/4599/4599153.png"
+   },
+   {
+     "categoryName": "Glucometers & Diabetic Care",
+     "categoryImage": "https://cdn-icons-png.flaticon.com/512/3953/3953045.png"
+   },
+   {
+     "categoryName": "Skincare",
+     "categoryImage": "https://cdn-icons-png.flaticon.com/512/6075/6075429.png"
+   },
+   {
+     "categoryName": "Diapering & Potty",
+     "categoryImage": "https://cdn-icons-png.flaticon.com/512/9794/9794969.png"
+   },
+   {
+     "categoryName": "Health & Immunity Boosters",
+     "categoryImage": "https://cdn-icons-png.flaticon.com/512/15594/15594383.png"
+   }
+ ]
+ 
