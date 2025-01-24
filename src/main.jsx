@@ -6,6 +6,7 @@ import { RouterProvider } from "react-router-dom";
 import AuthProvider from "./Context/Auth/AuthProvider";
 import "./index.css";
 import router from "./Router/Router";
+import { CartProvider } from "./Context/Cart/CartProvider";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <AuthProvider>
       <Toaster />
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <CartProvider>
+          <RouterProvider router={router} />
+        </CartProvider>
       </QueryClientProvider>
     </AuthProvider>
   </React.StrictMode>

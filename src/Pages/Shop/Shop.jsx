@@ -1,15 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useContext } from "react";
 import toast from "react-hot-toast";
 import { IoCartOutline, IoEyeOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
-import useAuth from "./../../Hooks/useAuth";
 import "sweetalert2/dist/sweetalert2.min.css";
+import useAuth from "./../../Hooks/useAuth";
 
 const Shop = () => {
-
-  
   const { user } = useAuth();
   const userEmail = user?.email;
   const [search, setSearch] = useState("");
@@ -33,10 +30,10 @@ const Shop = () => {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_BASE}/products`, {
+      const response = await axios.get(`${API_BASE}/medicines`, {
         params: { search, categoryName: category, sort, page, limit },
       });
-      setProducts(response.data.products);
+      setProducts(response.data.medicine);
       setTotalPages(response.data.totalPages);
     } catch (error) {
       setError(error);
@@ -51,43 +48,109 @@ const Shop = () => {
       toast.error("Please log in to add items to your cart.");
       return;
     }
-  
+
     const cartItem = {
-      productId: product._id,
-      productName: product.medicineName, // Include product name
-      price: product.price, // Include price
-      quantity: 1, // Default quantity to 1
-      userEmail: userEmail, 
+      productId: product?._id,
+      productImage: product?.image,
+      productName: product?.medicineName,
+      medicineGenericName: product?.medicineGenericName,
+      price: product?.fullStripPrice,
+      quantity: 1,
+      userEmail: userEmail,
+      massUnitValue:product?.massUnitValue,
+      itemMassUnit:product?.itemMassUnit,
+      companyName: product?.companyName,
+      discountPercentage: product?.discountPercentage,
     };
-  
+
+    console.log(cartItem)
     try {
       const response = await axios.post(`${API_BASE}/cart`, cartItem);
-      
-      // Ensure cart updates with correct data
-      setCart([...cart, { ...product, quantity: 1 }]); 
-      toast.success(`${product.medicineName} added to cart!`);
-      
+      setCart([...cart, { ...product, quantity: 1 }]);
+      toast.success(`${product?.medicineName} added to cart!`);
     } catch (error) {
-      console.error("Error adding to cart:", error.response?.data || error.message);
+      console.error(
+        "Error adding to cart:",
+        error.response?.data || error.message
+      );
       toast.error("Failed to add to cart.");
     }
   };
-  
 
   // View Product Details
   const handleViewDetails = (medicine) => {
+    const {
+      medicineName,
+      image,
+      detailedDescription,
+      discountPercentage,
+      companyName,
+      category,
+      perUnitPrice,
+      availableQuantity,
+      unitPerStrip,
+      fullStripPrice,
+      quantityType,
+      massUnitValue,
+      itemMassUnit,
+    } = medicine;
+    const { useCase, appliance, benefits, sideEffects } = detailedDescription;
+
     Swal.fire({
-      title: medicine.medicineName,
+      title: `${medicineName} ${massUnitValue} ${itemMassUnit}`,
       html: `
-        <img src="${medicine.image}" alt="${medicine.medicineName}" class="w-full mb-4" />
-        <p class="text-left">${medicine.detailedDescription}</p>
-        <div class="flex items-center justify-between mt-4">
-          <span>
-            <span class="line-through text-gray-500">$${medicine.price}</span>
-            <span class="text-xl font-bold text-black"> $${medicine.offerPrice}</span>
-          </span>
-          <span class="bg-blue-200 text-blue-500 px-2 py-1 badge badge-lg">${medicine.discount}% OFF</span>
+        <img src="${image}" alt="${medicineName}" class="w-full mb-4" />
+        <div class="flex items-center justify-between mb-4 text-xl">
+        <p class="text-left font-bold">${category}</p>
+        <div className="">
+            <span class="text-bold">$${fullStripPrice}</span>
+            ${
+              discountPercentage > 0
+                ? `<span class="bg-blue-200 text-blue-500 px-2 py-1 badge badge-lg">
+                ${discountPercentage}% OFF
+              </span>`
+                : ""
+            }
+          </div>
         </div>
+        <p class="text-left font-bold">Manufacturers:</p>
+        <p class="text-left mb-4">${companyName}</p>
+        
+        <p class="text-left font-bold">Use Case:</p>
+        <p class="text-left mb-4">${useCase}</p>
+        
+        <p class="text-left font-bold">How to Use:</p>
+        <p class="text-left mb-4">${appliance}</p>
+        
+        <p class="text-left font-bold">Benefits:</p>
+        <p class="text-left mb-4">${benefits}</p>
+        
+        <p class="text-left font-bold">Side Effects:</p>
+        <p class="text-left mb-4">${sideEffects}</p>
+    
+        <div class="mt-4">
+  <table class="w-full text-left border">
+    <tbody>
+      <tr>
+        <th class="font-bold py-2 px-4 border-b">Available Quantity:</th>
+        <td class="py-2 px-4 border-b">${availableQuantity} ${quantityType}</td>
+      </tr>
+      <tr>
+        <th class="font-bold py-2 px-4 border-b">Price per Unit:</th>
+        <td class="py-2 px-4 border-b">$${perUnitPrice}</td>
+      </tr>
+      <tr>
+        <th class="font-bold py-2 px-4 border-b">Units per Strip:</th>
+        <td class="py-2 px-4 border-b">${unitPerStrip}</td>
+      </tr>
+      <tr>
+        <th class="font-bold py-2 px-4 border-b">Price per Strip:</th>
+        <td class="py-2 px-4">$${fullStripPrice}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
       `,
       background: "#eff7fe",
       confirmButtonColor: "#00bfff",
@@ -124,7 +187,7 @@ const Shop = () => {
       {isLoading && <p>Loading products...</p>}
       {error && <p>Error fetching products</p>}
 
-      {!isLoading && products.length > 0 ? (
+      {!isLoading && products?.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border text-sm md:text-base">
             <thead>
@@ -132,29 +195,37 @@ const Shop = () => {
                 <th className="border p-2">Image</th>
                 <th className="border p-2">Name</th>
                 <th className="border p-2">Category</th>
-                <th className="border p-2">Price</th>
-                <th className="border p-2 text-left">Actions</th>
+                <th className="border p-2">Price Per Unit</th>
+                <th className="border p-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {products.map((product) => (
-                <tr key={product._id} className="border hover:bg-secondary">
+                <tr key={product?._id} className="border hover:bg-secondary">
                   <td className="p-2 flex justify-center items-center">
                     <img
-                      src={product.image}
-                      alt={product.medicineName}
-                      className="w-32 h-32 object-cover rounded-md"
+                      src={product?.image}
+                      alt={product?.medicineName}
+                      className="w-32 h-32 object-cover rounded-md relative"
                     />
+                    {product?.discountPercentage > 0 && (
+                      <span className="bg-blue-200 text-blue-500 px-2 py-1 badge badge-lg absolute  mb-24 mr-16">
+                        {product.discountPercentage}% OFF
+                      </span>
+                    )}
                   </td>
-                  <td className="p-2">{product.medicineName}</td>
-                  <td className="p-2">{product.categoryName}</td>
-                  <td className="p-2 text-right">
-                    ${product.offerPrice.toFixed(2)}
+                  <td className="p-2 border">
+                    {product?.medicineName} {product.massUnitValue}{" "}
+                    {product.itemMassUnit}
+                  </td>
+                  <td className="p-2 border">{product?.category}</td>
+                  <td className="p-2 text-right lg:pr-8">
+                    ${product?.perUnitPrice.toFixed(2)}
                   </td>
                   <td className="space-x-2">
                     <button
                       onClick={() => handleViewDetails(product)}
-                      className="bg-primary text-white px-3 py-1 rounded-sm"
+                      className="bg-primary text-white px-3 py-1 rounded-sm ml-8"
                     >
                       <IoEyeOutline />
                     </button>

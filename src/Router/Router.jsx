@@ -6,6 +6,8 @@ import Login from "../Pages/Login/Login";
 import Register from './../Pages/Register/Register';
 import ErrorPage from './../Pages/ErrorPage.jsx/ErrorPage';
 import Shop from './../Pages/Shop/Shop';
+import Cart from "../Pages/Cart/Cart";
+import PrivateRouter from './PrivateRouter';
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,12 @@ const router = createBrowserRouter([
       {
         path: "/shop",
         element: <Shop />,
+      },
+      {
+        path: "/cart",
+        element: <PrivateRouter>
+          <Cart />
+        </PrivateRouter>,
       },
       {
         path: "/login",
