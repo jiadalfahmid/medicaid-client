@@ -11,10 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-useAdmin.jsx
-useAxiosPublic.jsx
-useAxiossecure.jsx
-adminrouter.jsx
 .env
 
 # Editor directories and files

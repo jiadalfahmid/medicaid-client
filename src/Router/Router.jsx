@@ -8,6 +8,11 @@ import ErrorPage from './../Pages/ErrorPage.jsx/ErrorPage';
 import Shop from './../Pages/Shop/Shop';
 import Cart from "../Pages/Cart/Cart";
 import PrivateRouter from './PrivateRouter';
+import Dashboard from "../Pages/Dashboard/Dashboard";
+import AdminRoute from './AdminRouter';
+import AdminHome from "../Pages/AdminHome/AdminHome";
+import AllUser from "../Pages/AllUser/AllUser";
+import Categories from "../Pages/Categories/Categories";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +42,25 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />,
       },
+    ],
+  },
+  {
+    path: 'dashboard',
+    element: <PrivateRouter><Dashboard/></PrivateRouter>,
+    children: [
+      // admin only routes
+      {
+        path: 'admin-home',
+        element: <AdminRoute><AdminHome/></AdminRoute>
+      },
+      {
+        path: 'users',
+        element: <AdminRoute><AllUser/></AdminRoute>
+      },
+      {
+        path: 'category',
+        element: <AdminRoute><Categories/></AdminRoute>
+      }
     ],
   },
 ]);

@@ -4,8 +4,10 @@ import { useCart } from "../../Context/Cart/CartProvider";
 import useAuth from "../../Hooks/useAuth";
 import axios from "axios";  
 import { toast } from "react-hot-toast"; 
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const Navbar = () => {
+  const axiosSecure = useAxiosSecure();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { cart, cartCount, cartTotal, updateCart } = useCart(); 
@@ -24,9 +26,9 @@ const Navbar = () => {
     if (user && user.email) {
       const fetchCart = async () => {
         try {
-          const response = await axios.get(`${import.meta.env.VITE_API_BASE}/cart/${user.email}`);
+          const response = await axiosSecure.get(`/cart/${user.email}`);
           const cartItems = response.data; 
-          updateCart(cartItems);  // Update the global cart state
+          updateCart(cartItems);
 
         } catch (error) {
           console.error("Error fetching cart:", error);
@@ -136,7 +138,7 @@ const Navbar = () => {
                 <li>
                   <Link to="/profile" className="justify-between">Update Profile</Link>
                 </li>
-                <li><Link to="/dashboard">Dashboard</Link></li>
+                <li><Link to="/dashboard/admin-home">Dashboard</Link></li>
                 <li><button onClick={handleLogout}>Logout</button></li>
               </ul>
             </div>

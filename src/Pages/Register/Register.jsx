@@ -4,8 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import UseAuth from "../../Hooks/UseAuth";
 import useHelmet from "./../../Hooks/useHelmet";
 import { FaGoogle } from 'react-icons/fa';
+import useAxiosPublic from './../../Hooks/useAxiosPublic';
+import Swal from 'sweetalert2';
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const Register = () => {
+  const axiosPublic = useAxiosPublic();
   const navigate = useNavigate();
   const {
     signUp,
@@ -30,6 +34,7 @@ const Register = () => {
     const email = e.target.email.value;
     const password = e.target.password.value;
 
+
     if (!validatePassword(password)) {
       setError(
         "Password must have at least one uppercase letter, one lowercase letter, and be at least 6 characters long."
@@ -41,7 +46,27 @@ const Register = () => {
       setError("");
       setSuccess("");
       await signUp(name, email, password, photo);
-      setSuccess("Registration successful! Redirecting...");
+      const userInfo = {
+        name: name,
+        email: email,
+        role: "user",
+      }
+      axiosPublic.post('/users', userInfo)
+      .then(res => {
+        if (res.data.insertedId) {
+          console.log('user added to the database')
+          reset();
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'User created successfully.',
+            showConfirmButton: false,
+            timer: 3000
+          });
+          setSuccess("Registration successful! Redirecting...");
+          navigate('/');
+            }
+        })
       navigate("/");
     } catch (err) {
       setError(err.message);

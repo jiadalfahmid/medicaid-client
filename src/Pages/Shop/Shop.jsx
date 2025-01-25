@@ -11,6 +11,7 @@ const Shop = () => {
   const userEmail = user?.email;
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState([]);
   const [sort, setSort] = useState("asc");
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState([]);
@@ -31,7 +32,7 @@ const Shop = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(`${API_BASE}/medicines`, {
-        params: { search, categoryName: category, sort, page, limit },
+        params: { search, category: category, sort, page, limit },
       });
       setProducts(response.data.medicine);
       setTotalPages(response.data.totalPages);
@@ -42,6 +43,20 @@ const Shop = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE}/categories/name`
+        );
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleAddToCart = async (product) => {
     if (!userEmail) {
@@ -57,13 +72,12 @@ const Shop = () => {
       price: product?.fullStripPrice,
       quantity: 1,
       userEmail: userEmail,
-      massUnitValue:product?.massUnitValue,
-      itemMassUnit:product?.itemMassUnit,
+      massUnitValue: product?.massUnitValue,
+      itemMassUnit: product?.itemMassUnit,
       companyName: product?.companyName,
       discountPercentage: product?.discountPercentage,
     };
 
-    console.log(cartItem)
     try {
       const response = await axios.post(`${API_BASE}/cart`, cartItem);
       setCart([...cart, { ...product, quantity: 1 }]);
@@ -175,11 +189,11 @@ const Shop = () => {
           className="border p-2 border-r-8 border-r-transparent"
         >
           <option value="">All Categories</option>
-          <option value="Medicine">Medicine</option>
-          <option value="Diabetic Care">Diabetic Care</option>
-          <option value="Skincare">Skincare</option>
-          <option value="Baby Care">Baby Care</option>
-          <option value="Immunity Boosters">Immunity Boosters</option>
+          {categories.map((category, idx) => (
+            <option key={idx} value={category}>
+              {category}
+            </option>
+          ))}
         </select>
       </div>
 
