@@ -1,129 +1,175 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
-import useAxiosSecure from './../../Hooks/useAxiosSecure';
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import useAuth from "../../Hooks/useAuth";
 
 const SellerAdsManager = () => {
-   const axiosSecure = useAxiosSecure();
-  const [medicines, setMedicines] = useState([]);
-  const [image, setImage] = useState(null);
-  const [description, setDescription] = useState("");
-  const [discount, setDiscount] = useState(0);
-  const [status, setStatus] = useState("pending");
-  const [showModal, setShowModal] = useState(false);
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const [ads, setAds] = useState([]);
 
-
-  // Fetch all the seller's referred medicines
   useEffect(() => {
-    const fetchMedicines = async () => {
+    if (!user?.email) return;
+
+    const fetchAds = async () => {
       try {
-        const response = await axiosSecure.get(`/medicines/referred`);
-        setMedicines(response.data);
+        const response = await axiosSecure.get(`/ads/${user.email}`);
+        setAds(response.data);
       } catch (error) {
-        console.error("Error fetching medicines:", error);
-        toast.error("Failed to fetch medicines.");
+        console.error("Error fetching ads:", error);
+        toast.error("Failed to fetch ads.");
       }
     };
 
-    fetchMedicines();
-  }, []);
+    fetchAds();
+  }, [user.email]);
 
-  // Add advertisement
-  const handleAddAdvertisement = async () => {
-    if (!image || !description) {
-      toast.error("Please provide both image and description.");
-      return;
-    }
+  const handleDeleteAd = async (adId) => {
+    const confirmDelete = await Swal.fire({
+      title: "Are you sure?",
+      text: "This advertisement will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Delete!",
+      cancelButtonText: "Cancel",
+    });
 
-    const formData = new FormData();
-    formData.append("image", image);
-    formData.append("description", description);
-    formData.append("discount", discount);
-    formData.append("status", status);
-
-    try {
-      const response = await axiosSecure.post(`/advertisements`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      toast.success("Advertisement added successfully!");
-      setShowModal(false);
-
-      
-      setMedicines([...medicines, response.data]);
-
-    } catch (error) {
-      console.error("Error adding advertisement:", error);
-      toast.error("Failed to add advertisement.");
+    if (confirmDelete.isConfirmed) {
+      try {
+        await axiosSecure.delete(`/ads/${adId}`);
+        setAds((prevAds) => prevAds.filter((ad) => ad._id !== adId));
+        toast.success("Advertisement deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting ad:", error);
+        toast.error("Failed to delete ad.");
+      }
     }
   };
 
-  // Show SweetAlert Modal
   const showAddAdvertisementModal = () => {
     Swal.fire({
       title: "Add Advertisement",
       html: `
-        <input type="file" id="medicineImage" class="swal2-input mb-3" />
-        <textarea id="description" placeholder="Enter advertisement description" class="swal2-input mb-3"></textarea>
-        <input type="number" id="discount" placeholder="Enter discount percentage" class="swal2-input mb-3" />
+        <input type="file" id="adImage" class="swal2-input w-9/12 border-none" />
+        <textarea id="adDescription" placeholder="Enter description" class="swal2-input input w-9/12 input-bordered"></textarea>
       `,
-      preConfirm: () => {
-        const image = document.getElementById("medicineImage").files[0];
-        const description = document.getElementById("description").value;
-        const discount = document.getElementById("discount").value;
+      preConfirm: async () => {
+        const imageFile = document.getElementById("adImage").files[0];
+        const description = document.getElementById("adDescription").value.trim();
 
-        if (!image || !description || !discount) {
-          Swal.showValidationMessage("Please fill all fields");
+        if (!imageFile || !description) {
+          Swal.showValidationMessage("All fields are required.");
           return false;
         }
 
-        return { image, description, discount };
+        const uploadedImageUrl = await uploadImageToImgBB(imageFile);
+        if (!uploadedImageUrl) return false;
+
+        return { uploadedImageUrl, description };
       },
       showCancelButton: true,
-      confirmButtonText: "Add Advertisement",
+      confirmButtonText: "Add Ad",
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        const { image, description, discount } = result.value;
-
-        setImage(image);
-        setDescription(description);
-        setDiscount(Number(discount));
-        handleAddAdvertisement();
+        const { uploadedImageUrl, description } = result.value;
+        handleAddAdvertisement(uploadedImageUrl, description);
       }
     });
   };
 
+  const uploadImageToImgBB = async (imageFile) => {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    try {
+      const response = await fetch(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      return data.data?.url;
+    } catch (error) {
+      toast.error("Image upload failed. Please try again.");
+      return null;
+    }
+  };
+
+  const handleAddAdvertisement = async (image, description) => {
+    toast.success("Advertisement added successfully!");
+    location.reload();
+      const response = await axiosSecure.post(`/ads`, {
+        sellerEmail: user.email,
+        image,
+        description,
+        status: "pending",
+      });
+
+        setAds((prevAds) => [...prevAds, response.data]);
+
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-semibold">Referred Medicines</h2>
-      <div className="mt-6">
-        {medicines.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {medicines.map((medicine) => (
-              <div key={medicine._id} className="border p-4 rounded-lg shadow-md">
-                <h3 className="font-semibold">{medicine.medicineName}</h3>
-                <p>{medicine.category}</p>
-                <div className="mt-4">
-                  <p className="text-sm font-semibold">Advertisement Status:</p>
-                  <p>{medicine.isAdvertised ? "Active in Slider" : "Not Advertised"}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No referred medicines found.</p>
-        )}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold">My Advertisements</h2>
+        <button
+          onClick={showAddAdvertisementModal}
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+        >
+          + Add Advertisement
+        </button>
       </div>
 
-      <button
-        onClick={showAddAdvertisementModal}
-        className="mt-6 bg-primary hover:bg-blue-500 text-white py-2 px-4 rounded"
-      >
-        Add Advertise
-      </button>
+      {ads.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2">Image</th>
+                <th className="border px-4 py-2">Description</th>
+                <th className="border px-4 py-2">Status</th>
+                <th className="border px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ads.map((ad) => (
+                <tr key={ad._id} className="text-center">
+                  <td className="border px-4 py-2">
+                    <img
+                      src={ad.image}
+                      alt={ad.description}
+                      className="mx-auto w-32 h-32 object-cover rounded"
+                    />
+                  </td>
+                  <td className="border px-4 py-2">{ad.description}</td>
+                  <td className="border px-4 py-2 font-bold">
+                    {ad.status === "pending" ? (
+                      <span className="text-yellow-400">Pending</span>
+                    ) : (
+                      <span className="text-green-500">Active</span>
+                    )}
+                  </td>
+                  <td className="border px-4 py-2">
+                    <button
+                      onClick={() => handleDeleteAd(ad._id)}
+                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="text-center text-gray-500">No advertisements found.</p>
+      )}
     </div>
   );
 };

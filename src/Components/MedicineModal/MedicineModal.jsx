@@ -1,67 +1,125 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
+import useAuth from "./../../Hooks/useAuth";
+import useAxiosSecure from './../../Hooks/useAxiosSecure';
 
 const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    medicineName: '',
-    medicineGenericName: '',
-    shortDescription: '',
+    medicineName: "",
+    medicineGenericName: "",
+    shortDescription: "",
     detailedDescription: {
-      useCase: '',
-      appliance: '',
-      benefits: '',
-      sideEffects: '',
+      useCase: "",
+      appliance: "",
+      benefits: "",
+      sideEffects: "",
     },
-    image: '',
-    category: '',
-    companyName: '',
-    itemMassUnit: '',
-    perUnitPrice: '',
-    unitPerStrip: '',
-    fullStripPrice: '',
-    discountPercentage: '',
-    availableQuantity: '',
-    quantityType: '',
-    massUnitValue: '',
-    sellerEmail: '',
+    category: "",
+    companyName: "",
+    itemMassUnit: "",
+    perUnitPrice: "",
+    unitPerStrip: "",
+    fullStripPrice: "",
+    discountPercentage: "",
+    availableQuantity: "",
+    quantityType: "",
+    massUnitValue: "",
+    sellerEmail: user?.email || "",
+    imageUrl: "",
   });
-
-  useEffect(() => {
-    if (medicine) {
-      setFormData(medicine);
-    }
-  }, [medicine]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('detailedDescription')) {
-      const [key] = name.split('.');
+    if (name.includes("detailedDescription")) {
+      const field = name.split(".")[1];
       setFormData((prev) => ({
         ...prev,
-        [key]: {
-          ...prev[key],
-          [name.split('.')[1]]: value,
-        },
+        detailedDescription: { ...prev.detailedDescription, [field]: value },
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSubmit = () => {
-    onSave(formData);
+  const uploadImageToImgBB = async (imageFile) => {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    try {
+      const response = await fetch(
+        `https://api.imgbb.com/1/upload?key=${
+          import.meta.env.VITE_IMGBB_API_KEY
+        }`
+,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      return data.data?.url;
+    } catch (error) {
+      toast.error("Image upload failed. Please try again.");
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const imageFile = document.getElementById("image").files[0];
+    if (imageFile) {
+      const uploadedImageUrl = await uploadImageToImgBB(imageFile);
+      if (!uploadedImageUrl) return;
+      formData.image = uploadedImageUrl;
+      try {
+        const response = await axiosSecure.post("/medicines", formData);
+        if (response.status === 200 || response.status === 201) {
+          toast.success("Medicine added successfully!");
+          onClose();
+        } else {
+          throw new Error("Failed to save medicine.");
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred.");
+      }
+    }
+
   };
 
   return (
-    <div className={`modal ${isOpen ? 'modal-open' : ''}`}>
+    <div className={`modal ${isOpen ? "modal-open" : ""}`}>
       <div className="modal-box w-full max-w-2xl p-6 space-y-4">
         <h2 className="text-2xl font-semibold text-primary">
-          {medicine ? 'Edit Medicine' : 'Add Medicine'}
+          {medicine ? "Edit Medicine" : "Add Medicine"}
         </h2>
 
         <form className="space-y-4">
+          {/* Image Upload */}
+          <div>
+            <label
+              htmlFor="image"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Upload Image
+            </label>
+            <input
+              id="image"
+              type="file"
+              name="image"
+              className="file-input file-input-bordered w-full"
+              onChange={handleChange}
+            />
+          </div>
           {/* Medicine Name */}
           <div>
-            <label htmlFor="medicineName" className="block text-sm font-medium text-gray-700">Medicine Name</label>
+            <label
+              htmlFor="medicineName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Medicine Name
+            </label>
             <input
               id="medicineName"
               type="text"
@@ -75,7 +133,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
 
           {/* Generic Name */}
           <div>
-            <label htmlFor="medicineGenericName" className="block text-sm font-medium text-gray-700">Generic Name</label>
+            <label
+              htmlFor="medicineGenericName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Generic Name
+            </label>
             <input
               id="medicineGenericName"
               type="text"
@@ -89,7 +152,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
 
           {/* Short Description */}
           <div>
-            <label htmlFor="shortDescription" className="block text-sm font-medium text-gray-700">Short Description</label>
+            <label
+              htmlFor="shortDescription"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Short Description
+            </label>
             <textarea
               id="shortDescription"
               name="shortDescription"
@@ -103,7 +171,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
           {/* Detailed Description */}
           <div className="space-y-2">
             <div>
-              <label htmlFor="detailedDescription.useCase" className="block text-sm font-medium text-gray-700">Use Case</label>
+              <label
+                htmlFor="detailedDescription.useCase"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Use Case
+              </label>
               <textarea
                 id="detailedDescription.useCase"
                 name="detailedDescription.useCase"
@@ -114,7 +187,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
               />
             </div>
             <div>
-              <label htmlFor="detailedDescription.appliance" className="block text-sm font-medium text-gray-700">Appliance</label>
+              <label
+                htmlFor="detailedDescription.appliance"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Appliance
+              </label>
               <textarea
                 id="detailedDescription.appliance"
                 name="detailedDescription.appliance"
@@ -125,7 +203,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
               />
             </div>
             <div>
-              <label htmlFor="detailedDescription.benefits" className="block text-sm font-medium text-gray-700">Benefits</label>
+              <label
+                htmlFor="detailedDescription.benefits"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Benefits
+              </label>
               <textarea
                 id="detailedDescription.benefits"
                 name="detailedDescription.benefits"
@@ -136,7 +219,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
               />
             </div>
             <div>
-              <label htmlFor="detailedDescription.sideEffects" className="block text-sm font-medium text-gray-700">Side Effects</label>
+              <label
+                htmlFor="detailedDescription.sideEffects"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Side Effects
+              </label>
               <textarea
                 id="detailedDescription.sideEffects"
                 name="detailedDescription.sideEffects"
@@ -148,21 +236,14 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             </div>
           </div>
 
-          {/* Image Upload */}
-          <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">Upload Image</label>
-            <input
-              id="image"
-              type="file"
-              name="image"
-              className="file-input file-input-bordered w-full"
-              onChange={handleChange}
-            />
-          </div>
-
           {/* Additional Fields */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Category
+            </label>
             <input
               id="category"
               type="text"
@@ -174,7 +255,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Company Name</label>
+            <label
+              htmlFor="companyName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Company Name
+            </label>
             <input
               id="companyName"
               type="text"
@@ -186,7 +272,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="itemMassUnit" className="block text-sm font-medium text-gray-700">Item Mass Unit</label>
+            <label
+              htmlFor="itemMassUnit"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Item Mass Unit
+            </label>
             <input
               id="itemMassUnit"
               type="text"
@@ -198,7 +289,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="perUnitPrice" className="block text-sm font-medium text-gray-700">Per Unit Price</label>
+            <label
+              htmlFor="perUnitPrice"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Per Unit Price
+            </label>
             <input
               id="perUnitPrice"
               type="number"
@@ -210,7 +306,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="unitPerStrip" className="block text-sm font-medium text-gray-700">Unit Per Strip</label>
+            <label
+              htmlFor="unitPerStrip"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Unit Per Strip
+            </label>
             <input
               id="unitPerStrip"
               type="number"
@@ -222,7 +323,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="fullStripPrice" className="block text-sm font-medium text-gray-700">Full Strip Price</label>
+            <label
+              htmlFor="fullStripPrice"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Full Strip Price
+            </label>
             <input
               id="fullStripPrice"
               type="number"
@@ -234,7 +340,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="discountPercentage" className="block text-sm font-medium text-gray-700">Discount Percentage</label>
+            <label
+              htmlFor="discountPercentage"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Discount Percentage
+            </label>
             <input
               id="discountPercentage"
               type="number"
@@ -246,7 +357,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="availableQuantity" className="block text-sm font-medium text-gray-700">Available Quantity</label>
+            <label
+              htmlFor="availableQuantity"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Available Quantity
+            </label>
             <input
               id="availableQuantity"
               type="number"
@@ -258,7 +374,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="quantityType" className="block text-sm font-medium text-gray-700">Quantity Type</label>
+            <label
+              htmlFor="quantityType"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Quantity Type
+            </label>
             <input
               id="quantityType"
               type="text"
@@ -270,7 +391,12 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="massUnitValue" className="block text-sm font-medium text-gray-700">Mass Unit Value</label>
+            <label
+              htmlFor="massUnitValue"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Mass Unit Value
+            </label>
             <input
               id="massUnitValue"
               type="number"
@@ -282,13 +408,20 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
             />
           </div>
           <div>
-            <label htmlFor="sellerEmail" className="block text-sm font-medium text-gray-700">Seller Email</label>
+            <label
+              htmlFor="sellerEmail"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Seller Email
+            </label>
             <input
               id="sellerEmail"
               type="email"
               name="sellerEmail"
+              value={user.email}
+              disabled
               className="input input-bordered w-full"
-              placeholder="Seller Email"
+              placeholder={user.email}
               value={formData.sellerEmail}
               onChange={handleChange}
             />
