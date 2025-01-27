@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
-import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import useAuth from "../../Hooks/useAuth";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const SellerAdsManager = () => {
   const { user } = useAuth();
@@ -52,13 +52,17 @@ const SellerAdsManager = () => {
       title: "Add Advertisement",
       html: `
         <input type="file" id="adImage" class="swal2-input w-9/12 border-none" />
+        <textarea id="adName" placeholder="Enter Name" class="swal2-input input w-9/12 input-bordered"></textarea>
         <textarea id="adDescription" placeholder="Enter description" class="swal2-input input w-9/12 input-bordered"></textarea>
       `,
       preConfirm: async () => {
         const imageFile = document.getElementById("adImage").files[0];
-        const description = document.getElementById("adDescription").value.trim();
+        const name = document.getElementById("adName").value.trim();
+        const description = document
+          .getElementById("adDescription")
+          .value.trim();
 
-        if (!imageFile || !description) {
+        if (!imageFile || !description || !name) {
           Swal.showValidationMessage("All fields are required.");
           return false;
         }
@@ -66,15 +70,15 @@ const SellerAdsManager = () => {
         const uploadedImageUrl = await uploadImageToImgBB(imageFile);
         if (!uploadedImageUrl) return false;
 
-        return { uploadedImageUrl, description };
+        return { uploadedImageUrl, description, name };
       },
       showCancelButton: true,
       confirmButtonText: "Add Ad",
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        const { uploadedImageUrl, description } = result.value;
-        handleAddAdvertisement(uploadedImageUrl, description);
+        const { uploadedImageUrl, description, name } = result.value;
+        handleAddAdvertisement(uploadedImageUrl, description, name);
       }
     });
   };
@@ -85,7 +89,9 @@ const SellerAdsManager = () => {
 
     try {
       const response = await fetch(
-        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+        `https://api.imgbb.com/1/upload?key=${
+          import.meta.env.VITE_IMGBB_API_KEY
+        }`,
         {
           method: "POST",
           body: formData,
@@ -99,18 +105,18 @@ const SellerAdsManager = () => {
     }
   };
 
-  const handleAddAdvertisement = async (image, description) => {
+  const handleAddAdvertisement = async (image, description, name) => {
     toast.success("Advertisement added successfully!");
     location.reload();
-      const response = await axiosSecure.post(`/ads`, {
-        sellerEmail: user.email,
-        image,
-        description,
-        status: "pending",
-      });
+    const response = await axiosSecure.post(`/ads`, {
+      sellerEmail: user.email,
+      name,
+      image,
+      description,
+      status: "pending",
+    });
 
-        setAds((prevAds) => [...prevAds, response.data]);
-
+    setAds((prevAds) => [...prevAds, response.data]);
   };
 
   return (
@@ -119,21 +125,21 @@ const SellerAdsManager = () => {
         <h2 className="text-2xl font-semibold">My Advertisements</h2>
         <button
           onClick={showAddAdvertisementModal}
-          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+          className="bg-primary hover:bg-accent text-white py-2 px-4 rounded"
         >
           + Add Advertisement
         </button>
       </div>
-
       {ads.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead className="bg-gray-100">
+        <div className="overflow-x-auto bg-base-100 rounded-lg">
+          <table className="min-w-full border border-gray-200">
+            <thead className="bg-accent text-white">
               <tr>
                 <th className="border px-4 py-2">Image</th>
+                <th className="border px-4 py-2">Name</th>
                 <th className="border px-4 py-2">Description</th>
                 <th className="border px-4 py-2">Status</th>
-                <th className="border px-4 py-2">Action</th>
+                <th className="border px-4 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -142,17 +148,24 @@ const SellerAdsManager = () => {
                   <td className="border px-4 py-2">
                     <img
                       src={ad.image}
-                      alt={ad.description}
+                      alt={ad.name}
                       className="mx-auto w-32 h-32 object-cover rounded"
                     />
                   </td>
+                  <td className="border px-4 py-2">{ad.name}</td>
                   <td className="border px-4 py-2">{ad.description}</td>
-                  <td className="border px-4 py-2 font-bold">
-                    {ad.status === "pending" ? (
-                      <span className="text-yellow-400">Pending</span>
-                    ) : (
-                      <span className="text-green-500">Active</span>
-                    )}
+                  <td className="border px-4 py-2">
+                  <span
+                    className={`badge rounded-full text-sm ${
+                      ad.status === "approved"
+                        ? "bg-green-200 text-green-700"
+                        : ad.status === "rejected"
+                        ? "bg-red-200 text-red-700"
+                        : "bg-yellow-200 text-yellow-500"
+                    }`}
+                  >
+                    {ad.status}
+                  </span>
                   </td>
                   <td className="border px-4 py-2">
                     <button

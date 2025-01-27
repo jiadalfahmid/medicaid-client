@@ -90,7 +90,7 @@ const AllUser = () => {
       <div className="overflow-x-auto w-full">
         <table className="table-auto w-full text-left border-collapse bg-base-100">
           <thead>
-            <tr className="bg-secondary">
+            <tr className="bg-primary text-white">
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Email</th>
               <th className="px-4 py-2">Role</th>
