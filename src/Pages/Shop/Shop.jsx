@@ -34,7 +34,18 @@ const Shop = () => {
       const response = await axios.get(`${API_BASE}/medicines`, {
         params: { search, category: category, sort, page, limit },
       });
-      setProducts(response.data.medicine);
+
+      // Ensure numerical values are parsed as numbers
+      const updatedProducts = response.data.medicine.map(product => ({
+        ...product,
+        perUnitPrice: Number(product.perUnitPrice),
+        fullStripPrice: Number(product.fullStripPrice),
+        discountPercentage: Number(product.discountPercentage),
+        availableQuantity: Number(product.availableQuantity),
+        unitPerStrip: Number(product.unitPerStrip),
+      }));
+
+      setProducts(updatedProducts);
       setTotalPages(response.data.totalPages);
     } catch (error) {
       setError(error);
@@ -69,13 +80,13 @@ const Shop = () => {
       productImage: product?.image,
       productName: product?.medicineName,
       medicineGenericName: product?.medicineGenericName,
-      price: product?.fullStripPrice,
+      price: Number(product?.fullStripPrice),
       quantity: 1,
       userEmail: userEmail,
       massUnitValue: product?.massUnitValue,
       itemMassUnit: product?.itemMassUnit,
       companyName: product?.companyName,
-      discountPercentage: product?.discountPercentage,
+      discountPercentage: Number(product?.discountPercentage),
     };
 
     try {
@@ -117,9 +128,9 @@ const Shop = () => {
         <div class="flex items-center justify-between mb-4 text-xl">
         <p class="text-left font-bold">${category}</p>
         <div className="">
-            <span class="text-bold">$${fullStripPrice}</span>
+            <span class="text-bold">$${Number(fullStripPrice).toFixed(2)}</span>
             ${
-              discountPercentage > 0
+              Number(discountPercentage) > 0
                 ? `<span class="bg-blue-200 text-blue-500 px-2 py-1 badge badge-lg">
                 ${discountPercentage}% OFF
               </span>`
@@ -147,24 +158,23 @@ const Shop = () => {
     <tbody>
       <tr>
         <th class="font-bold py-2 px-4 border-b">Available Quantity:</th>
-        <td class="py-2 px-4 border-b">${availableQuantity} ${quantityType}</td>
+        <td class="py-2 px-4 border-b">${Number(availableQuantity)} ${quantityType}</td>
       </tr>
       <tr>
         <th class="font-bold py-2 px-4 border-b">Price per Unit:</th>
-        <td class="py-2 px-4 border-b">$${perUnitPrice}</td>
+        <td class="py-2 px-4 border-b">$${Number(perUnitPrice).toFixed(2)}</td>
       </tr>
       <tr>
         <th class="font-bold py-2 px-4 border-b">Units per Strip:</th>
-        <td class="py-2 px-4 border-b">${unitPerStrip}</td>
+        <td class="py-2 px-4 border-b">${Number(unitPerStrip)}</td>
       </tr>
       <tr>
         <th class="font-bold py-2 px-4 border-b">Price per Strip:</th>
-        <td class="py-2 px-4">$${fullStripPrice}</td>
+        <td class="py-2 px-4">$${Number(fullStripPrice).toFixed(2)}</td>
       </tr>
     </tbody>
   </table>
 </div>
-
       `,
       background: "#eff7fe",
       confirmButtonColor: "#00bfff",
@@ -222,32 +232,32 @@ const Shop = () => {
                       alt={product?.medicineName}
                       className="w-32 h-32 object-cover rounded-md relative"
                     />
-                    {product?.discountPercentage > 0 && (
+                    {Number(product?.discountPercentage) > 0 && (
                       <span className="bg-blue-200 text-blue-500 px-2 py-1 badge badge-lg absolute  mb-24 mr-16">
-                        {product.discountPercentage}% OFF
+                        {product?.discountPercentage}% OFF
                       </span>
                     )}
                   </td>
                   <td className="p-2 border">
-                    {product?.medicineName} {product.massUnitValue}{" "}
-                    {product.itemMassUnit}
+                    {product?.medicineName} {product?.massUnitValue}{" "}
+                    {product?.itemMassUnit}
                   </td>
                   <td className="p-2 border">{product?.category}</td>
                   <td className="p-2 text-right lg:pr-8">
-                    ${product?.perUnitPrice.toFixed(2)}
+                    ${Number(product?.perUnitPrice).toFixed(2)}
                   </td>
                   <td className="space-x-2">
                     <button
                       onClick={() => handleViewDetails(product)}
-                      className="bg-primary text-white px-3 py-1 rounded-sm ml-8"
+                      className="bg-primary hover:bg-accent text-white p-2 rounded-lg"
                     >
-                      <IoEyeOutline />
+                      <IoEyeOutline className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="bg-primary text-white px-3 py-1 rounded-sm"
+                      className="bg-primary hover:bg-accent text-white p-2 rounded-lg"
                     >
-                      <IoCartOutline />
+                      <IoCartOutline className="w-5 h-5" />
                     </button>
                   </td>
                 </tr>
@@ -256,7 +266,7 @@ const Shop = () => {
           </table>
         </div>
       ) : (
-        !isLoading && <p>No products found.</p>
+        <p>No products available</p>
       )}
 
       {/* Pagination */}

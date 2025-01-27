@@ -15,6 +15,9 @@ import Shop from "./../Pages/Shop/Shop";
 import AdminRoute from "./AdminRouter";
 import PrivateRouter from "./PrivateRouter";
 import SellerRoute from "./SellerRouter";
+import SellerAdsManager from "../Pages/SellerAdsManager/SellerAdsManager";
+import SellerHome from "../Pages/SellerHome/SellerHome";
+import SellerMedicinePage from "../Pages/SellerMedicinePage/SellerMedicinePage";
 
 const router = createBrowserRouter([
   {
@@ -91,7 +94,23 @@ const router = createBrowserRouter([
       },
       // Seller only routes
       {
-        path: "ads-manager",
+        path: "seller-home",
+        element: (
+          <SellerRoute>
+            <SellerHome />
+          </SellerRoute>
+        ),
+      },
+      {
+        path: "medicines",
+        element: (
+          <SellerRoute>
+            <SellerMedicinePage />
+          </SellerRoute>
+        ),
+      },
+      {
+        path: "add-ads",
         element: (
           <SellerRoute>
             <SellerAdsManager />

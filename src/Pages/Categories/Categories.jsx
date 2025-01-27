@@ -7,7 +7,6 @@ const ManageCategory = () => {
   const axiosSecure = useAxiosSecure();
   const [loading, setLoading] = useState(true);
 
-  console.log(categories);
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {

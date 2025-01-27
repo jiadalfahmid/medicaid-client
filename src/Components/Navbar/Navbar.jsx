@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../Context/Cart/CartProvider"; 
 import useAuth from "../../Hooks/useAuth";
@@ -9,6 +9,7 @@ import useAxiosSecure from "../../Hooks/useAxiosSecure";
 const Navbar = () => {
   const axiosSecure = useAxiosSecure();
   const { user, logout } = useAuth();
+  const [role, setRole] = useState(null);
   const navigate = useNavigate();
   const { cart, cartCount, cartTotal, updateCart } = useCart(); 
 
@@ -21,24 +22,29 @@ const Navbar = () => {
     }
   };
 
-  // Fetch cart details
   useEffect(() => {
     if (user && user.email) {
+      // Fetch cart details
       const fetchCart = async () => {
-        try {
           const response = await axiosSecure.get(`/cart/${user.email}`);
           const cartItems = response.data; 
           updateCart(cartItems);
-
-        } catch (error) {
-          console.error("Error fetching cart:", error);
-          toast.error("Failed to fetch cart.");
-        }
       };
       
       fetchCart();
+
+      // Fetch User Role
+      const fetchUserRole = async () => {
+        try {
+          const response = await axiosSecure.get(`/users/${user.email}`);
+          setRole(response.data.role); 
+        } catch (error) {
+          console.error("Failed to fetch user role", error);
+        }
+      };
+      fetchUserRole();
     }
-  }, [user, updateCart]);  // Add updateCart to dependencies so it triggers on cart changes
+  }, [user, updateCart]);
 
   const links = (
     <>
@@ -138,7 +144,9 @@ const Navbar = () => {
                 <li>
                   <Link to="/profile" className="justify-between">Update Profile</Link>
                 </li>
-                <li><Link to="/dashboard/admin-home">Dashboard</Link></li>
+                <li>
+                <Link to={`/dashboard/${role}-home`}>Dashboard</Link>
+                  </li>
                 <li><button onClick={handleLogout}>Logout</button></li>
               </ul>
             </div>
