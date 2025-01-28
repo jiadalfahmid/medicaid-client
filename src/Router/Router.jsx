@@ -23,6 +23,7 @@ import PaymentHistory from './../Pages/PaymentHistory/PaymentHistory';
 import InvoicePage from "../Pages/InvoicePage/InvoicePage";
 import ProfilePage from "../Pages/Profile/Profile";
 import PaymentManagement from "../Pages/PaymentManagement/PaymentManagement";
+import UnderConstruction from "../Components/UnderConstruction/UnderConstruction";
 
 const router = createBrowserRouter([
   {
@@ -121,7 +122,7 @@ const router = createBrowserRouter([
         path: "report",
         element: (
           <AdminRoute>
-            <PaymentManagement />
+            <UnderConstruction />
           </AdminRoute>
         ),
       },

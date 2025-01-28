@@ -99,7 +99,8 @@ const CheckoutForm = () => {
         setTransactionId(paymentIntent.id);
 
         const paymentData = {
-          email: user.email,
+          userEmail: user.email,
+          sellerEmail: cart.sellerEmail,
           price: finalTotal,
           quantity: totalQuantity,
           transactionId: paymentIntent.id,

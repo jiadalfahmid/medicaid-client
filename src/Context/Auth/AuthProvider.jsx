@@ -67,9 +67,8 @@ const AuthProvider = ({ children }) => {
         role: "user",
       };
       await axios.post(`${import.meta.env.VITE_API_BASE}/users`, userInfo).then((result) => {
-        navigate("/");
+        setSuccess("Google sign-in successful!");
       });
-      setSuccess("Google sign-in successful!");
     } catch (err) {
       setError(err.message);
     } finally {

@@ -89,6 +89,7 @@ const Shop = () => {
       massUnitValue: product?.massUnitValue,
       itemMassUnit: product?.itemMassUnit,
       companyName: product?.companyName,
+      sellerEmail: product.sellerEmail || "seller@medicaid.com",
       discountPercentage: Number(product?.discountPercentage),
     };
 
@@ -121,6 +122,7 @@ const Shop = () => {
       quantityType,
       massUnitValue,
       itemMassUnit,
+      sellerEmail,
     } = medicine;
     const { useCase, appliance, benefits, sideEffects } = detailedDescription;
 
