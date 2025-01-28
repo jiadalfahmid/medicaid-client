@@ -5,8 +5,10 @@ import { IoCartOutline, IoEyeOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import useAuth from "./../../Hooks/useAuth";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const Shop = () => {
+  const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const userEmail = user?.email;
   const [search, setSearch] = useState("");
@@ -90,7 +92,7 @@ const Shop = () => {
     };
 
     try {
-      const response = await axios.post(`${API_BASE}/cart`, cartItem);
+      const response = await axiosSecure.post(`/cart`, cartItem);
       setCart([...cart, { ...product, quantity: 1 }]);
       toast.success(`${product?.medicineName} added to cart!`);
     } catch (error) {

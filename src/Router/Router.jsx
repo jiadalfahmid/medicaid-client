@@ -18,6 +18,7 @@ import SellerRoute from "./SellerRouter";
 import SellerAdsManager from "../Pages/SellerAdsManager/SellerAdsManager";
 import SellerHome from "../Pages/SellerHome/SellerHome";
 import SellerMedicinePage from "../Pages/SellerMedicinePage/SellerMedicinePage";
+import CheckoutPage from "../Pages/CheckoutPage/CheckoutPage";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRouter>
             <Cart />
+          </PrivateRouter>
+        ),
+      },
+      {
+        path: "/checkout",
+        element: (
+          <PrivateRouter>
+            <CheckoutPage />
           </PrivateRouter>
         ),
       },
