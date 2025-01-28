@@ -1,4 +1,4 @@
-import axios from "axios"; // Import axios for API requests
+import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import app from "../../Firebase/firebase.config";
 

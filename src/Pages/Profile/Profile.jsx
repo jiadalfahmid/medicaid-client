@@ -18,7 +18,7 @@ const ProfilePage = () => {
         {/* Profile Header */}
         <div className="flex items-center mb-6">
           <img
-            src={user?.photoURL || "/default-profile.jpg"} // Display the user's image or a default one
+            src={user?.photoURL} 
             alt="Profile"
             className="h-16 w-16 rounded-full mr-6"
           />

@@ -38,7 +38,6 @@ const Shop = () => {
         params: { search, category: category, sort, page, limit },
       });
 
-      // Ensure numerical values are parsed as numbers
       const updatedProducts = response.data.medicine.map(product => ({
         ...product,
         perUnitPrice: Number(product.perUnitPrice),

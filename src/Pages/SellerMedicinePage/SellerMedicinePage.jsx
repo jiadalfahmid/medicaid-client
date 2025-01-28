@@ -2,29 +2,23 @@ import React, { useState } from 'react';
 import MedicineTable from '../../Components/MedicineTable/MedicineTable';
 import MedicineModal from '../../Components/MedicineModal/MedicineModal';
 import useAxiosSecure from './../../Hooks/useAxiosSecure';
-import Swal from 'sweetalert2'; // SweetAlert2 import
-import toast from 'react-hot-toast'; // React HotToast import
+import Swal from 'sweetalert2'; 
+import toast from 'react-hot-toast'; 
 
 const SellerMedicinePage = () => {
   const axiosSecure = useAxiosSecure();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentMedicine, setCurrentMedicine] = useState(null); // Track current medicine (for editing)
+  const [currentMedicine, setCurrentMedicine] = useState(null); medicine (for editing)
 
-  // Handle save functionality for adding new medicine
+  
   const handleSave = async (medicineData) => {
     try {
-      // Make the API call to add the new medicine
+     
       const response = await axiosSecure.post('/medicines', medicineData);
       console.log('Medicine added:', response.data);
-      
-      // Close the modal after saving the medicine
       setIsModalOpen(false);
 
-      // Show success message with HotToast
       toast.success('Medicine added successfully!');
-
-      // Optionally, you can refetch the medicine list to update the UI
-      // fetchMedicines();
     } catch (error) {
       console.error('Error adding medicine:', error);
       toast.error('Failed to add medicine!');
@@ -33,14 +27,12 @@ const SellerMedicinePage = () => {
 
   // Open modal for adding a new medicine
   const openAddNewMedicineModal = () => {
-    setCurrentMedicine(null); // No medicine data when adding new
+    setCurrentMedicine(null);
     setIsModalOpen(true);
   };
 
-  // Handle delete functionality with SweetAlert2
   const handleDelete = async (medicineId) => {
     try {
-      // Show confirmation alert using SweetAlert2
       const result = await Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to delete this medicine?',
@@ -51,15 +43,11 @@ const SellerMedicinePage = () => {
       });
 
       if (result.isConfirmed) {
-        // Make the API call to delete the medicine
         const response = await axiosSecure.delete(`/medicines/${medicineId}`);
         console.log('Medicine deleted:', response.data);
 
-        // Show success toast notification
         toast.success('Medicine deleted successfully!');
 
-        // Optionally, you can refetch the medicine list to update the UI
-        // fetchMedicines();
       }
     } catch (error) {
       console.error('Error deleting medicine:', error);
