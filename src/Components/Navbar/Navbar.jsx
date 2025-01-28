@@ -205,7 +205,7 @@ const Navbar = () => {
               >
                 <li>
                   <Link to="/profile" className="justify-between">
-                    Update Profile
+                    Profile
                   </Link>
                 </li>
                 <li>

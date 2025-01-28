@@ -21,6 +21,7 @@ import SellerMedicinePage from "../Pages/SellerMedicinePage/SellerMedicinePage";
 import CheckoutPage from "../Pages/CheckoutPage/CheckoutPage";
 import PaymentHistory from './../Pages/PaymentHistory/PaymentHistory';
 import InvoicePage from "../Pages/InvoicePage/InvoicePage";
+import ProfilePage from "../Pages/Profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "/shop",
         element: <Shop />,
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
       {
         path: "/cart",
