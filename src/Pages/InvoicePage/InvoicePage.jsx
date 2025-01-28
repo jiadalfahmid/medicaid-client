@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import useAuth from "../../Hooks/useAuth";
+import { jsPDF } from "jspdf";
 
 const InvoicePage = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
   const [invoice, setInvoice] = useState(null);
-  const invoiceRef = useRef();
+  const invoiceRef = useRef(null);
 
   useEffect(() => {
     axiosSecure
@@ -16,10 +16,52 @@ const InvoicePage = () => {
       .catch((err) => console.error("Error fetching invoice:", err));
   }, [axiosSecure, user]);
 
-  const handlePrint = useReactToPrint({
-    content: () => invoiceRef.current,
-    documentTitle: `Invoice_${invoice?.transactionId}`,
-  });
+  const handleDownloadPdf = () => {
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "normal");
+
+    // Header
+    doc.setFontSize(24);
+    doc.text("Medicaid", 20, 20);
+    doc.setFontSize(22);
+    doc.text("Invoice", 20, 30);
+    doc.setFontSize(12);
+    doc.text(`Invoice #${invoice.transactionId}`, 20, 40);
+
+    // User Information
+    doc.text(`Billing To: ${user.displayName || "Anonymous"}`, 20, 50);
+    doc.text(user.email, 20, 60);
+
+    // Purchase Details
+    let y = 70;
+    doc.text("Medicines", 20, y);
+    doc.text("Quantity", 80, y);
+    doc.text("Price", 120, y);
+    doc.text("Total", 160, y);
+
+    y += 10;
+    invoice.medicineItemNames?.forEach((name, idx) => {
+      doc.text(name, 20, y);
+      doc.text(`${invoice.itemQuantities[idx]}`, 80, y);
+      doc.text(`$${invoice.itemPrices[idx].toFixed(2)}`, 120, y);
+      doc.text(`$${(invoice.itemPrices[idx] * invoice.itemQuantities[idx]).toFixed(2)}`, 160, y);
+      y += 10;
+    });
+
+    // Summary
+    y += 10;
+    doc.text(`Discount: -$${invoice.totalDiscount.toFixed(2)}`, 120, y);
+    y += 10;
+    doc.text(`Total: $${invoice.totalPrice.toFixed(2)}`, 120, y);
+
+    // Date
+    y += 10;
+    doc.text(`Date: ${new Date(invoice.date).toLocaleDateString()}`, 120, y);
+
+    // Save the PDF
+    doc.save(`Invoice_${invoice.transactionId}.pdf`);
+  };
 
   if (!invoice) {
     return <p className="text-center text-gray-500 mt-10">Loading invoice...</p>;
@@ -30,7 +72,7 @@ const InvoicePage = () => {
       <div ref={invoiceRef} className="bg-white p-6 shadow-lg rounded-lg">
         {/* Header with Logo */}
         <div className="flex justify-between items-center border-b pb-4 mb-4">
-          <img src="/logo.png" alt="Logo" className="h-12" />
+          <img src="/favicon.png" alt="Logo" className="h-12" />
           <div>
             <h2 className="text-2xl font-semibold text-primary">Invoice</h2>
             <p className="text-gray-500">#{invoice.transactionId}</p>
@@ -48,19 +90,21 @@ const InvoicePage = () => {
         <table className="w-full border-collapse border border-base-300 mb-6">
           <thead>
             <tr className="bg-base-200">
-              <th className="border border-base-300 p-2">Item</th>
-              <th className="border border-base-300 p-2">Price</th>
+              <th className="border border-base-300 p-2">Medicines</th>
               <th className="border border-base-300 p-2">Quantity</th>
+              <th className="border border-base-300 p-2">Price</th>
               <th className="border border-base-300 p-2">Total</th>
             </tr>
           </thead>
           <tbody>
-            {invoice.items?.map((item, index) => (
-              <tr key={index} className="border border-base-300">
-                <td className="p-2">{item.name}</td>
-                <td className="p-2">${item.price.toFixed(2)}</td>
-                <td className="p-2 text-center">{item.quantity}</td>
-                <td className="p-2">${(item.price * item.quantity).toFixed(2)}</td>
+            {invoice.medicineItemNames?.map((name, idx) => (
+              <tr key={idx}>
+                <td className="p-2 border">{name}</td>
+                <td className="p-2 border text-center">{invoice.itemQuantities[idx]}</td>
+                <td className="p-2 border text-right">${invoice.itemPrices[idx].toFixed(2)}</td>
+                <td className="p-2 border text-right">
+                  ${(invoice.itemPrices[idx] * invoice.itemQuantities[idx]).toFixed(2)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -69,18 +113,21 @@ const InvoicePage = () => {
         {/* Summary */}
         <div className="text-right">
           <p className="text-lg font-semibold">
-            Total: <span className="text-primary">${invoice.price.toFixed(2)}</span>
+            Discount: <span className="text-red-500">-${invoice.totalDiscount.toFixed(2)}</span>
+          </p>
+          <p className="text-lg font-semibold">
+            Total: <span className="text-primary">${invoice.totalPrice.toFixed(2)}</span>
           </p>
           <p className="text-sm text-gray-500">{new Date(invoice.date).toLocaleDateString()}</p>
         </div>
       </div>
 
-      {/* Print Button */}
+      {/* Download Button */}
       <button
-        onClick={handlePrint}
+        onClick={handleDownloadPdf}
         className="btn btn-primary mt-4 w-full text-white"
       >
-        Print / Download PDF
+        Download PDF
       </button>
     </div>
   );

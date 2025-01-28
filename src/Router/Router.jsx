@@ -20,6 +20,7 @@ import SellerHome from "../Pages/SellerHome/SellerHome";
 import SellerMedicinePage from "../Pages/SellerMedicinePage/SellerMedicinePage";
 import CheckoutPage from "../Pages/CheckoutPage/CheckoutPage";
 import PaymentHistory from './../Pages/PaymentHistory/PaymentHistory';
+import InvoicePage from "../Pages/InvoicePage/InvoicePage";
 
 const router = createBrowserRouter([
   {
@@ -49,6 +50,14 @@ const router = createBrowserRouter([
           <PrivateRouter>
             <CheckoutPage />
           </PrivateRouter>
+        ),
+      },
+      {
+        path: "/invoice",
+        element: (
+            <PrivateRouter>
+              <InvoicePage />
+            </PrivateRouter>
         ),
       },
       {

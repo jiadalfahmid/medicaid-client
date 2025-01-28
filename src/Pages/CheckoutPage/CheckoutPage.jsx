@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   CardElement,
   Elements,
@@ -6,11 +5,13 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import useAuth from "../../Hooks/useAuth";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import useCart from "../../Hooks/useCart";
-import useAuth from "../../Hooks/useAuth";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -20,15 +21,27 @@ const CheckoutForm = () => {
   const [cart, refetch] = useCart();
   const stripe = useStripe();
   const elements = useElements();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [transactionId, setTransactionId] = useState("");
 
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const totalDiscount = cart.reduce((sum, item) => sum + (item.discountPercentage ? (item.price * item.quantity * item.discountPercentage) / 100 : 0), 0);
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const totalDiscount = cart.reduce(
+    (sum, item) =>
+      sum +
+      (item.discountPercentage
+        ? (item.price * item.quantity * item.discountPercentage) / 100
+        : 0),
+    0
+  );
   const finalTotal = totalPrice - totalDiscount;
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
     if (finalTotal > 0) {
@@ -69,15 +82,16 @@ const CheckoutForm = () => {
     }
 
     try {
-      const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            email: user?.email || "anonymous",
-            name: user?.displayName || "anonymous",
+      const { paymentIntent, error: confirmError } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              email: user?.email || "anonymous",
+              name: user?.displayName || "anonymous",
+            },
           },
-        },
-      });
+        });
 
       if (confirmError) {
         setMessage(confirmError.message);
@@ -87,10 +101,15 @@ const CheckoutForm = () => {
         const paymentData = {
           email: user.email,
           price: finalTotal,
+          quantity: totalQuantity,
           transactionId: paymentIntent.id,
           date: new Date(),
           cartIds: cart.map((item) => item._id),
-          menuItemIds: cart.map((item) => item.menuId),
+          medicineItemNames: cart.map((item) => item.productName),
+          itemQuantities: cart.map((item) => item.quantity),
+          itemPrices: cart.map((item) => item.price),
+          totalDiscount: totalDiscount,
+          totalPrice: totalPrice,
           status: "pending",
         };
 
@@ -103,7 +122,9 @@ const CheckoutForm = () => {
             showConfirmButton: false,
             timer: 1500,
           });
+
           refetch();
+          navigate(`/invoice`);
         }
       }
     } catch (error) {
@@ -115,15 +136,22 @@ const CheckoutForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 bg-base-100 rounded-lg shadow-lg max-w-md mx-auto">
+    <form
+      onSubmit={handleSubmit}
+      className="p-6 bg-base-100 rounded-lg shadow-lg max-w-md mx-auto"
+    >
       <h2 className="text-2xl font-semibold mb-4">Checkout</h2>
       <label className="block mb-2">Enter your card details:</label>
       <div className="border p-3 rounded mb-4">
         <CardElement />
       </div>
       {message && <p className="text-red-500 text-sm mb-2">{message}</p>}
-      <button type="submit" className="btn btn-primary text-white w-full" disabled={!stripe || loading}>
-        {loading ? "Processing..." : "Pay Now"}
+      <button
+        type="submit"
+        className="btn btn-primary text-white w-full"
+        disabled={!stripe || loading}
+      >
+        {loading ? "Processing..." : `Pay $${finalTotal.toFixed(2)}`}
       </button>
     </form>
   );
