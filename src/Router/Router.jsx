@@ -22,6 +22,7 @@ import CheckoutPage from "../Pages/CheckoutPage/CheckoutPage";
 import PaymentHistory from './../Pages/PaymentHistory/PaymentHistory';
 import InvoicePage from "../Pages/InvoicePage/InvoicePage";
 import ProfilePage from "../Pages/Profile/Profile";
+import PaymentManagement from "../Pages/PaymentManagement/PaymentManagement";
 
 const router = createBrowserRouter([
   {
@@ -105,6 +106,22 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <Categories />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "payment",
+        element: (
+          <AdminRoute>
+            <PaymentManagement />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "report",
+        element: (
+          <AdminRoute>
+            <PaymentManagement />
           </AdminRoute>
         ),
       },
