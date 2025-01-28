@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import useAuth from "./useAuth";
 
 const axiosSecure = axios.create({
-  baseURL: "https://medicaid-inky.vercel.app",
+  baseURL: `${import.meta.env.VITE_API_BASE}`
 });
 
 const useAxiosSecure = () => {

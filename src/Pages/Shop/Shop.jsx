@@ -5,10 +5,12 @@ import { IoCartOutline, IoEyeOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import useAuth from "./../../Hooks/useAuth";
-import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import useAxiosSecure from './../../Hooks/useAxiosSecure';
 
 const Shop = () => {
   const axiosSecure = useAxiosSecure();
+  const axiosPublic = useAxiosPublic();
   const { user } = useAuth();
   const userEmail = user?.email;
   const [search, setSearch] = useState("");
@@ -23,7 +25,6 @@ const Shop = () => {
   const [cart, setCart] = useState([]);
   const limit = 10;
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
 
   useEffect(() => {
     fetchProducts();
@@ -33,7 +34,7 @@ const Shop = () => {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_BASE}/medicines`, {
+      const response = await axiosPublic.get(`/medicines`, {
         params: { search, category: category, sort, page, limit },
       });
 
@@ -60,8 +61,8 @@ const Shop = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE}/categories/name`
+        const response = await axiosPublic.get(
+          `/categories/name`
         );
         setCategories(response.data);
       } catch (error) {

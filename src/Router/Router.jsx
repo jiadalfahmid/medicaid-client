@@ -19,6 +19,7 @@ import SellerAdsManager from "../Pages/SellerAdsManager/SellerAdsManager";
 import SellerHome from "../Pages/SellerHome/SellerHome";
 import SellerMedicinePage from "../Pages/SellerMedicinePage/SellerMedicinePage";
 import CheckoutPage from "../Pages/CheckoutPage/CheckoutPage";
+import PaymentHistory from './../Pages/PaymentHistory/PaymentHistory';
 
 const router = createBrowserRouter([
   {
@@ -124,6 +125,14 @@ const router = createBrowserRouter([
           <SellerRoute>
             <SellerAdsManager />
           </SellerRoute>
+        ),
+      },
+      {
+        path: "payment-history",
+        element: (
+            <PrivateRouter>
+              <PaymentHistory />
+            </PrivateRouter>
         ),
       },
     ],
