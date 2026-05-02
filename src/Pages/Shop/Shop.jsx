@@ -7,6 +7,8 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import useAuth from "./../../Hooks/useAuth";
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
 import useAxiosSecure from './../../Hooks/useAxiosSecure';
+import SkeletonCard from "../../Components/SkeletonCard/SkeletonCard";
+import EmptyState from "../../Components/EmptyState/EmptyState";
 
 const Shop = () => {
   const axiosSecure = useAxiosSecure();
@@ -209,11 +211,25 @@ const Shop = () => {
             </option>
           ))}
         </select>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="border p-2 border-r-8 border-r-transparent"
+        >
+          <option value="asc">Price: Low to High</option>
+          <option value="desc">Price: High to Low</option>
+        </select>
       </div>
 
       {/* Product List */}
-      {isLoading && <p>Loading products...</p>}
-      {error && <p>Error fetching products</p>}
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
+          {[...Array(6)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      )}
+      {error && <EmptyState message="Error fetching products" subMessage="Please try again later." />}
 
       {!isLoading && products?.length > 0 ? (
         <div className="overflow-x-auto">
@@ -234,6 +250,7 @@ const Shop = () => {
                     <img
                       src={product?.image}
                       alt={product?.medicineName}
+                      loading="lazy"
                       className="w-32 h-32 object-cover rounded-md relative"
                     />
                     {Number(product?.discountPercentage) > 0 && (
@@ -253,15 +270,17 @@ const Shop = () => {
                   <td className="space-x-2">
                     <button
                       onClick={() => handleViewDetails(product)}
-                      className="bg-primary hover:bg-accent text-white p-2 rounded-lg"
+                      aria-label={`View details of ${product?.medicineName}`}
+                      className="min-w-[44px] min-h-[44px] bg-primary hover:bg-accent text-white p-2 rounded-lg"
                     >
-                      <IoEyeOutline className="w-5 h-5" />
+                      <IoEyeOutline className="w-5 h-5 mx-auto" />
                     </button>
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="bg-primary hover:bg-accent text-white p-2 rounded-lg"
+                      aria-label={`Add ${product?.medicineName} to cart`}
+                      className="min-w-[44px] min-h-[44px] bg-primary hover:bg-accent text-white p-2 rounded-lg"
                     >
-                      <IoCartOutline className="w-5 h-5" />
+                      <IoCartOutline className="w-5 h-5 mx-auto" />
                     </button>
                   </td>
                 </tr>
@@ -269,16 +288,22 @@ const Shop = () => {
             </tbody>
           </table>
         </div>
-      ) : (
-        <p>No products available</p>
-      )}
+      ) : !isLoading ? (
+        <EmptyState 
+          message="No products found" 
+          subMessage="Try adjusting your filters or search query." 
+          actionText="Clear Filters" 
+          onAction={() => { setSearch(""); setCategory(""); setSort("asc"); }} 
+        />
+      ) : null}
 
       {/* Pagination */}
       <div className="flex justify-center mt-4 gap-2">
         <button
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
-          className="btn btn-primary text-white"
+          aria-label="Previous Page"
+          className="btn btn-primary text-white min-h-[44px] min-w-[44px]"
         >
           Prev
         </button>
@@ -286,7 +311,8 @@ const Shop = () => {
           <button
             key={index}
             onClick={() => setPage(index + 1)}
-            className={`btn ${
+            aria-label={`Page ${index + 1}`}
+            className={`btn min-h-[44px] min-w-[44px] ${
               page === index + 1 ? "btn-primary text-white" : "btn-secondary"
             }`}
           >
@@ -296,7 +322,8 @@ const Shop = () => {
         <button
           disabled={page >= totalPages}
           onClick={() => setPage(page + 1)}
-          className="btn btn-primary text-white"
+          aria-label="Next Page"
+          className="btn btn-primary text-white min-h-[44px] min-w-[44px]"
         >
           Next
         </button>

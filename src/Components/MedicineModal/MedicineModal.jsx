@@ -2,33 +2,36 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import useAuth from "./../../Hooks/useAuth";
 import useAxiosSecure from './../../Hooks/useAxiosSecure';
+import { AlertCircle } from "lucide-react";
 
 const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const [formData, setFormData] = useState({
-    medicineName: "",
-    medicineGenericName: "",
-    shortDescription: "",
+    medicineName: medicine?.medicineName || "",
+    medicineGenericName: medicine?.medicineGenericName || "",
+    shortDescription: medicine?.shortDescription || "",
     detailedDescription: {
-      useCase: "",
-      appliance: "",
-      benefits: "",
-      sideEffects: "",
+      useCase: medicine?.detailedDescription?.useCase || "",
+      appliance: medicine?.detailedDescription?.appliance || "",
+      benefits: medicine?.detailedDescription?.benefits || "",
+      sideEffects: medicine?.detailedDescription?.sideEffects || "",
     },
-    category: "",
-    companyName: "",
-    itemMassUnit: "",
-    perUnitPrice: "",
-    unitPerStrip: "",
-    fullStripPrice: "",
-    discountPercentage: "",
-    availableQuantity: "",
-    quantityType: "",
-    massUnitValue: "",
+    category: medicine?.category || "",
+    companyName: medicine?.companyName || "",
+    itemMassUnit: medicine?.itemMassUnit || "",
+    perUnitPrice: medicine?.perUnitPrice || "",
+    unitPerStrip: medicine?.unitPerStrip || "",
+    fullStripPrice: medicine?.fullStripPrice || "",
+    discountPercentage: medicine?.discountPercentage || "",
+    availableQuantity: medicine?.availableQuantity || "",
+    quantityType: medicine?.quantityType || "",
+    massUnitValue: medicine?.massUnitValue || "",
     sellerEmail: user?.email || "",
-    imageUrl: "",
+    image: medicine?.image || "",
   });
+
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,26 +44,40 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+    // clear error for this field
+    setErrors(prev => ({ ...prev, [name]: "" }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.medicineName) newErrors.medicineName = "Medicine Name is required.";
+    if (!formData.category) newErrors.category = "Category is required.";
+    if (!formData.companyName) newErrors.companyName = "Company Name is required.";
+    if (!formData.perUnitPrice) newErrors.perUnitPrice = "Price is required.";
+    if (!document.getElementById("image").files[0] && !formData.image) {
+      newErrors.image = "Image is required.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const uploadImageToImgBB = async (imageFile) => {
-    const formData = new FormData();
-    formData.append("image", imageFile);
+    const formDataObj = new FormData();
+    formDataObj.append("image", imageFile);
     try {
       const response = await fetch(
         `https://api.imgbb.com/1/upload?key=${
           import.meta.env.VITE_IMGBB_API_KEY
-        }`
-,
+        }`,
         {
           method: "POST",
-          body: formData,
+          body: formDataObj,
         }
       );
       const data = await response.json();
       return data.data?.url;
     } catch (error) {
-      toast.error("Image upload failed. Please try again.");
+      setErrors(prev => ({ ...prev, image: "Image upload failed." }));
       return null;
     }
   };
@@ -68,12 +85,20 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!validate()) return;
+
     const imageFile = document.getElementById("image").files[0];
     if (imageFile) {
       const uploadedImageUrl = await uploadImageToImgBB(imageFile);
       if (!uploadedImageUrl) return;
       formData.image = uploadedImageUrl;
-      try {
+    }
+
+    try {
+      // Use onSave instead of directly calling axios if onSave is provided
+      if (onSave) {
+        await onSave(formData);
+      } else {
         const response = await axiosSecure.post("/medicines", formData);
         if (response.status === 200 || response.status === 201) {
           toast.success("Medicine added successfully!");
@@ -81,11 +106,46 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
         } else {
           throw new Error("Failed to save medicine.");
         }
-      } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred.");
       }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "An error occurred.");
     }
+  };
 
+  const renderInput = (id, label, type = "text", value, placeholder, isTextarea = false) => {
+    const isError = !!errors[id];
+    return (
+      <div className="mb-4">
+        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+        {isTextarea ? (
+          <textarea
+            id={id}
+            name={id}
+            className={`textarea textarea-bordered w-full focus:outline-none focus:ring-4 transition-shadow ${isError ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' : 'focus:border-primary focus:ring-primary/50'}`}
+            placeholder={placeholder}
+            value={value}
+            onChange={handleChange}
+          />
+        ) : (
+          <input
+            id={id}
+            type={type}
+            name={id}
+            className={`input input-bordered w-full focus:outline-none focus:ring-4 transition-shadow ${isError ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' : 'focus:border-primary focus:ring-primary/50'}`}
+            placeholder={placeholder}
+            value={value}
+            onChange={handleChange}
+          />
+        )}
+        {isError && (
+          <p className="text-red-500 text-sm mt-1 flex items-center gap-1 font-medium">
+            <AlertCircle className="w-4 h-4" /> {errors[id]}
+          </p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -95,353 +155,69 @@ const MedicineModal = ({ isOpen, onClose, medicine, onSave }) => {
           {medicine ? "Edit Medicine" : "Add Medicine"}
         </h2>
 
-        <form className="space-y-4">
+        <form className="space-y-2">
           {/* Image Upload */}
-          <div>
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-700"
-            >
+          <div className="mb-4">
+            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
               Upload Image
             </label>
             <input
               id="image"
               type="file"
               name="image"
-              className="file-input file-input-bordered w-full"
-              onChange={handleChange}
+              className={`file-input file-input-bordered w-full focus:outline-none focus:ring-4 transition-shadow ${errors.image ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' : 'focus:border-primary focus:ring-primary/50'}`}
+              onChange={() => setErrors(prev => ({ ...prev, image: "" }))}
             />
-          </div>
-          {/* Medicine Name */}
-          <div>
-            <label
-              htmlFor="medicineName"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Medicine Name
-            </label>
-            <input
-              id="medicineName"
-              type="text"
-              name="medicineName"
-              className="input input-bordered w-full"
-              placeholder="Medicine Name"
-              value={formData.medicineName}
-              onChange={handleChange}
-            />
+            {errors.image && (
+              <p className="text-red-500 text-sm mt-1 flex items-center gap-1 font-medium">
+                <AlertCircle className="w-4 h-4" /> {errors.image}
+              </p>
+            )}
           </div>
 
-          {/* Generic Name */}
-          <div>
-            <label
-              htmlFor="medicineGenericName"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Generic Name
-            </label>
-            <input
-              id="medicineGenericName"
-              type="text"
-              name="medicineGenericName"
-              className="input input-bordered w-full"
-              placeholder="Generic Name"
-              value={formData.medicineGenericName}
-              onChange={handleChange}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {renderInput("medicineName", "Medicine Name", "text", formData.medicineName, "Medicine Name")}
+            {renderInput("medicineGenericName", "Generic Name", "text", formData.medicineGenericName, "Generic Name")}
+            {renderInput("category", "Category", "text", formData.category, "Category")}
+            {renderInput("companyName", "Company Name", "text", formData.companyName, "Company Name")}
           </div>
 
-          {/* Short Description */}
-          <div>
-            <label
-              htmlFor="shortDescription"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Short Description
-            </label>
-            <textarea
-              id="shortDescription"
-              name="shortDescription"
-              className="textarea textarea-bordered w-full"
-              placeholder="Short Description"
-              value={formData.shortDescription}
-              onChange={handleChange}
-            />
+          {renderInput("shortDescription", "Short Description", "text", formData.shortDescription, "Short Description", true)}
+
+          <div className="space-y-4 mt-4 border-t pt-4">
+            <h3 className="font-medium text-gray-700">Detailed Description</h3>
+            {renderInput("detailedDescription.useCase", "Use Case", "text", formData.detailedDescription.useCase, "Use Case", true)}
+            {renderInput("detailedDescription.appliance", "Appliance", "text", formData.detailedDescription.appliance, "Appliance", true)}
+            {renderInput("detailedDescription.benefits", "Benefits", "text", formData.detailedDescription.benefits, "Benefits", true)}
+            {renderInput("detailedDescription.sideEffects", "Side Effects", "text", formData.detailedDescription.sideEffects, "Side Effects", true)}
           </div>
 
-          {/* Detailed Description */}
-          <div className="space-y-2">
-            <div>
-              <label
-                htmlFor="detailedDescription.useCase"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Use Case
-              </label>
-              <textarea
-                id="detailedDescription.useCase"
-                name="detailedDescription.useCase"
-                className="textarea textarea-bordered w-full"
-                placeholder="Use Case"
-                value={formData.detailedDescription.useCase}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="detailedDescription.appliance"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Appliance
-              </label>
-              <textarea
-                id="detailedDescription.appliance"
-                name="detailedDescription.appliance"
-                className="textarea textarea-bordered w-full"
-                placeholder="Appliance"
-                value={formData.detailedDescription.appliance}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="detailedDescription.benefits"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Benefits
-              </label>
-              <textarea
-                id="detailedDescription.benefits"
-                name="detailedDescription.benefits"
-                className="textarea textarea-bordered w-full"
-                placeholder="Benefits"
-                value={formData.detailedDescription.benefits}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="detailedDescription.sideEffects"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Side Effects
-              </label>
-              <textarea
-                id="detailedDescription.sideEffects"
-                name="detailedDescription.sideEffects"
-                className="textarea textarea-bordered w-full"
-                placeholder="Side Effects"
-                value={formData.detailedDescription.sideEffects}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {/* Additional Fields */}
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Category
-            </label>
-            <input
-              id="category"
-              type="text"
-              name="category"
-              className="input input-bordered w-full"
-              placeholder="Category"
-              value={formData.category}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="companyName"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Company Name
-            </label>
-            <input
-              id="companyName"
-              type="text"
-              name="companyName"
-              className="input input-bordered w-full"
-              placeholder="Company Name"
-              value={formData.companyName}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="itemMassUnit"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Item Mass Unit
-            </label>
-            <input
-              id="itemMassUnit"
-              type="text"
-              name="itemMassUnit"
-              className="input input-bordered w-full"
-              placeholder="Item Mass Unit"
-              value={formData.itemMassUnit}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="perUnitPrice"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Per Unit Price
-            </label>
-            <input
-              id="perUnitPrice"
-              type="number"
-              name="perUnitPrice"
-              className="input input-bordered w-full"
-              placeholder="Per Unit Price"
-              value={formData.perUnitPrice}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="unitPerStrip"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Unit Per Strip
-            </label>
-            <input
-              id="unitPerStrip"
-              type="number"
-              name="unitPerStrip"
-              className="input input-bordered w-full"
-              placeholder="Unit Per Strip"
-              value={formData.unitPerStrip}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="fullStripPrice"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Full Strip Price
-            </label>
-            <input
-              id="fullStripPrice"
-              type="number"
-              name="fullStripPrice"
-              className="input input-bordered w-full"
-              placeholder="Full Strip Price"
-              value={formData.fullStripPrice}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="discountPercentage"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Discount Percentage
-            </label>
-            <input
-              id="discountPercentage"
-              type="number"
-              name="discountPercentage"
-              className="input input-bordered w-full"
-              placeholder="Discount Percentage"
-              value={formData.discountPercentage}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="availableQuantity"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Available Quantity
-            </label>
-            <input
-              id="availableQuantity"
-              type="number"
-              name="availableQuantity"
-              className="input input-bordered w-full"
-              placeholder="Available Quantity"
-              value={formData.availableQuantity}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="quantityType"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Quantity Type
-            </label>
-            <input
-              id="quantityType"
-              type="text"
-              name="quantityType"
-              className="input input-bordered w-full"
-              placeholder="Quantity Type"
-              value={formData.quantityType}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="massUnitValue"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Mass Unit Value
-            </label>
-            <input
-              id="massUnitValue"
-              type="number"
-              name="massUnitValue"
-              className="input input-bordered w-full"
-              placeholder="Mass Unit Value"
-              value={formData.massUnitValue}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="sellerEmail"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Seller Email
-            </label>
-            <input
-              id="sellerEmail"
-              type="email"
-              name="sellerEmail"
-              value={user.email}
-              disabled
-              className="input input-bordered w-full"
-              placeholder={user.email}
-              value={formData.sellerEmail}
-              onChange={handleChange}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t pt-4">
+            {renderInput("itemMassUnit", "Item Mass Unit", "text", formData.itemMassUnit, "Item Mass Unit")}
+            {renderInput("massUnitValue", "Mass Unit Value", "number", formData.massUnitValue, "Mass Unit Value")}
+            {renderInput("quantityType", "Quantity Type", "text", formData.quantityType, "Quantity Type")}
+            {renderInput("availableQuantity", "Available Quantity", "number", formData.availableQuantity, "Available Quantity")}
+            {renderInput("perUnitPrice", "Per Unit Price", "number", formData.perUnitPrice, "Per Unit Price")}
+            {renderInput("unitPerStrip", "Unit Per Strip", "number", formData.unitPerStrip, "Unit Per Strip")}
+            {renderInput("fullStripPrice", "Full Strip Price", "number", formData.fullStripPrice, "Full Strip Price")}
+            {renderInput("discountPercentage", "Discount Percentage", "number", formData.discountPercentage, "Discount Percentage")}
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-end space-x-4 mt-4">
+          <div className="flex justify-end space-x-4 mt-8 pt-4">
             <button
               type="button"
-              className="btn btn-primary"
-              onClick={handleSubmit}
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
+              className="btn min-h-[44px] btn-secondary text-white"
               onClick={onClose}
             >
               Close
+            </button>
+            <button
+              type="button"
+              className="btn min-h-[44px] btn-primary text-white"
+              onClick={handleSubmit}
+            >
+              Save Medicine
             </button>
           </div>
         </form>

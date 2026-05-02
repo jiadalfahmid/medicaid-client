@@ -1,23 +1,24 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const ErrorPage = () => {
-  const navigate = useNavigate();
-
-  const handleHomeRedirect = () => {
-    navigate('/');
-  };
-
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-base-100 text-neutral-content">
-      <h1 className="text-4xl font-bold text-error">Oops! Something went wrong.</h1>
-      <p className="mt-4 text-xl">The page you're looking for does not exist.</p>
-      <button
-        onClick={handleHomeRedirect}
-        className="mt-6 btn btn-primary"
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-md w-full text-center bg-white p-8 md:p-12 rounded-3xl shadow-2xl"
       >
-        Go to Home
-      </button>
+        <div className="text-9xl font-black text-slate-100 mb-4">404</div>
+        <h1 className="text-3xl font-bold text-slate-800 mb-4">Page Not Found</h1>
+        <p className="text-slate-500 mb-8">
+          The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        </p>
+        <Link to="/" className="btn btn-primary text-white w-full rounded-full shadow-lg shadow-primary/30">
+          Return to Home
+        </Link>
+      </motion.div>
     </div>
   );
 };

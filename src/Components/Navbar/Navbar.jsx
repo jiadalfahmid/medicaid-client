@@ -83,7 +83,7 @@ const Navbar = () => {
         {/* Left Side: Logo & Mobile Menu */}
         <div className="navbar-start">
           <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+            <div tabIndex={0} role="button" aria-label="Toggle mobile menu" className="btn btn-ghost lg:hidden min-w-[44px] min-h-[44px]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -123,7 +123,8 @@ const Navbar = () => {
             <div
               tabIndex={0}
               role="button"
-              className="btn hover:bg-secondary btn-ghost btn-circle"
+              aria-label="Open cart"
+              className="btn hover:bg-secondary btn-ghost btn-circle min-w-[44px] min-h-[44px]"
             >
               <div className="indicator">
                 <svg
@@ -193,7 +194,8 @@ const Navbar = () => {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn btn-ghost hover:bg-secondary btn-circle avatar"
+                aria-label="User profile menu"
+                className="btn btn-ghost hover:bg-secondary btn-circle avatar min-w-[44px] min-h-[44px]"
               >
                 <div className="w-10 rounded-full">
                   <img src={user?.photoURL} alt={user?.displayName} />

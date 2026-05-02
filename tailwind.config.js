@@ -11,17 +11,18 @@ export default {
     themes: [
       {
         light: {
-          'background': '#f8fcff',  // Soft white-blue for a clean medical feel
-          'primary': '#00bfff',     // Professional medical blue
-          'secondary': '#eff7fe',   // Deep teal for contrast
-          'accent': '#00ccff',      // Vibrant cyan for highlights
-          'neutral': '#f0f4f8',     // Light gray-blue for backgrounds/cards
-          'base-100': '#ffffff',    // Pure white for containers
-          'base-content': '#1a2e40', // Dark navy for readability
-          'info': '#3b82f6',        // Blue for info messages
-          'success': '#22c55e',     // Green for success messages
-          'warning': '#f59e0b',     // Orange for warnings
-          'error': '#ef4444',       // Red for errors
+          'background': '#f4f7fb',
+          'primary': '#2563eb',     // Royal Blue
+          'secondary': '#f0fdf4',   // Mint green tint
+          'accent': '#10b981',      // Emerald Green
+          'neutral': '#1f2937',     // Dark Gray
+          'base-100': '#ffffff',    // Pure White
+          'base-200': '#f8fafc',
+          'base-content': '#0f172a',// Slate 900
+          'info': '#3b82f6',
+          'success': '#22c55e',
+          'warning': '#f59e0b',
+          'error': '#ef4444',
         },
       },
     ],

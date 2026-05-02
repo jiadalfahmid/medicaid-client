@@ -12,6 +12,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import useAuth from "../../Hooks/useAuth";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import useCart from "../../Hooks/useCart";
+import { AlertCircle } from "lucide-react";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -25,6 +26,7 @@ const CheckoutForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [cardError, setCardError] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [transactionId, setTransactionId] = useState("");
 
@@ -59,6 +61,11 @@ const CheckoutForm = () => {
 
     if (!stripe || !elements) {
       setMessage("Stripe has not loaded yet.");
+      setLoading(false);
+      return;
+    }
+
+    if (cardError) {
       setLoading(false);
       return;
     }
@@ -142,15 +149,30 @@ const CheckoutForm = () => {
       className="p-6 bg-base-100 rounded-lg shadow-lg max-w-md mx-auto"
     >
       <h2 className="text-2xl font-semibold mb-4">Checkout</h2>
-      <label className="block mb-2">Enter your card details:</label>
-      <div className="border p-3 rounded mb-4">
-        <CardElement />
+      <label className="block mb-2 font-medium">Enter your card details:</label>
+      <div 
+        className={`border p-3 rounded mb-4 focus-within:ring-4 transition-all ${
+          cardError || message 
+            ? "border-red-500 focus-within:ring-red-500/50" 
+            : "border-gray-300 focus-within:ring-primary/50"
+        }`}
+      >
+        <CardElement onChange={(e) => setCardError(e.error ? e.error.message : "")} />
       </div>
-      {message && <p className="text-red-500 text-sm mb-2">{message}</p>}
+      {cardError && (
+        <p className="text-red-500 text-sm mb-3 flex items-center gap-1 font-medium">
+          <AlertCircle className="w-4 h-4" /> {cardError}
+        </p>
+      )}
+      {message && (
+        <p className="text-red-500 text-sm mb-3 flex items-center gap-1 font-medium">
+          <AlertCircle className="w-4 h-4" /> {message}
+        </p>
+      )}
       <button
         type="submit"
-        className="btn btn-primary text-white w-full"
-        disabled={!stripe || loading}
+        className="btn btn-primary text-white w-full min-h-[44px] focus:ring-4 focus:ring-primary/50"
+        disabled={!stripe || loading || !!cardError}
       >
         {loading ? "Processing..." : `Pay $${finalTotal.toFixed(2)}`}
       </button>

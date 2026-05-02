@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const SellerMedicinePage = () => {
   const axiosSecure = useAxiosSecure();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentMedicine, setCurrentMedicine] = useState(null); medicine (for editing)
+  const [currentMedicine, setCurrentMedicine] = useState(null); // medicine (for editing)
 
   
   const handleSave = async (medicineData) => {

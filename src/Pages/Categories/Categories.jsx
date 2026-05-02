@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import MedLoader from "../../Components/MedLoader/MedLoader";
+import EmptyState from "../../Components/EmptyState/EmptyState";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -109,7 +111,7 @@ const Categories = () => {
     });
   };
 
-  if (loading) return <div className="text-center">Loading...</div>;
+  if (loading) return <MedLoader />;
 
   return (
     <div className="p-6">
@@ -117,46 +119,53 @@ const Categories = () => {
         <h1 className="text-2xl font-semibold">Manage Categories</h1>
         <button
           onClick={handleAddCategory}
-          className="bg-primary hover:bg-accent text-white px-4 py-2 rounded"
+          aria-label="Add a new category"
+          className="bg-primary hover:bg-accent text-white px-4 py-2 rounded min-h-[44px] min-w-[44px]"
         >
           + Add Category
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-primary text-white text-center">
-              <th className="border px-4 py-2">Image</th>
-              <th className="border px-4 py-2">Category Name</th>
-              <th className="border px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category._id} className="border">
-                <td className="border px-4 py-2">
-                  <img src={category.categoryImage} alt={category.categoryName} className="h-12 w-12 object-cover rounded mx-auto" />
-                </td>
-                <td className="border px-4 py-2">{category.categoryName}</td>
-                <td className="border px-4 py-2 flex gap-2 justify-center">
-                  <button
-                    onClick={() => handleUpdateCategory(category)}
-                    className="bg-primary hover:bg-accent text-white px-4 py-2 rounded"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteCategory(category._id)}
-                    className="btn btn-error text-white px-4 py-2 rounded"
-                  >
-                    Delete
-                  </button>
-                </td>
+      {categories.length === 0 ? (
+        <EmptyState message="No Categories Found" subMessage="Click the + Add Category button to create one." />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-primary text-white text-center">
+                <th className="border px-4 py-2">Image</th>
+                <th className="border px-4 py-2">Category Name</th>
+                <th className="border px-4 py-2">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {categories.map((category) => (
+                <tr key={category._id} className="border">
+                  <td className="border px-4 py-2">
+                    <img src={category.categoryImage} alt={category.categoryName} loading="lazy" className="h-12 w-12 object-cover rounded mx-auto" />
+                  </td>
+                  <td className="border px-4 py-2">{category.categoryName}</td>
+                  <td className="border px-4 py-2 flex gap-2 justify-center">
+                    <button
+                      onClick={() => handleUpdateCategory(category)}
+                      aria-label={`Edit ${category.categoryName}`}
+                      className="bg-primary hover:bg-accent text-white px-4 py-2 rounded min-h-[44px] min-w-[44px]"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCategory(category._id)}
+                      aria-label={`Delete ${category.categoryName}`}
+                      className="btn btn-error text-white px-4 py-2 rounded min-h-[44px] min-w-[44px]"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

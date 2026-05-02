@@ -1,29 +1,38 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import MedLoader from "../Components/MedLoader/MedLoader";
 
-import AdminAdsManager from "../Pages/AdminAdsManager/AdminAdsManager";
-import AdminHome from "../Pages/AdminHome/AdminHome";
-import AllUser from "../Pages/AllUser/AllUser";
-import Cart from "../Pages/Cart/Cart";
-import Categories from "../Pages/Categories/Categories";
-import Dashboard from "../Pages/Dashboard/Dashboard";
-import Home from "../Pages/Home/Home";
-import Login from "../Pages/Login/Login";
 import Root from "../Pages/Root/Root";
 import ErrorPage from "./../Pages/ErrorPage.jsx/ErrorPage";
-import Register from "./../Pages/Register/Register";
-import Shop from "./../Pages/Shop/Shop";
 import AdminRoute from "./AdminRouter";
 import PrivateRouter from "./PrivateRouter";
 import SellerRoute from "./SellerRouter";
-import SellerAdsManager from "../Pages/SellerAdsManager/SellerAdsManager";
-import SellerHome from "../Pages/SellerHome/SellerHome";
-import SellerMedicinePage from "../Pages/SellerMedicinePage/SellerMedicinePage";
-import CheckoutPage from "../Pages/CheckoutPage/CheckoutPage";
-import PaymentHistory from './../Pages/PaymentHistory/PaymentHistory';
-import InvoicePage from "../Pages/InvoicePage/InvoicePage";
-import ProfilePage from "../Pages/Profile/Profile";
-import PaymentManagement from "../Pages/PaymentManagement/PaymentManagement";
-import UnderConstruction from "../Components/UnderConstruction/UnderConstruction";
+import Dashboard from "../Pages/Dashboard/Dashboard";
+
+const AdminAdsManager = lazy(() => import("../Pages/AdminAdsManager/AdminAdsManager"));
+const AdminHome = lazy(() => import("../Pages/AdminHome/AdminHome"));
+const AllUser = lazy(() => import("../Pages/AllUser/AllUser"));
+const Cart = lazy(() => import("../Pages/Cart/Cart"));
+const Categories = lazy(() => import("../Pages/Categories/Categories"));
+const Home = lazy(() => import("../Pages/Home/Home"));
+const Login = lazy(() => import("../Pages/Login/Login"));
+const Register = lazy(() => import("./../Pages/Register/Register"));
+const Shop = lazy(() => import("./../Pages/Shop/Shop"));
+const SellerAdsManager = lazy(() => import("../Pages/SellerAdsManager/SellerAdsManager"));
+const SellerHome = lazy(() => import("../Pages/SellerHome/SellerHome"));
+const SellerMedicinePage = lazy(() => import("../Pages/SellerMedicinePage/SellerMedicinePage"));
+const CheckoutPage = lazy(() => import("../Pages/CheckoutPage/CheckoutPage"));
+const PaymentHistory = lazy(() => import("./../Pages/PaymentHistory/PaymentHistory"));
+const InvoicePage = lazy(() => import("../Pages/InvoicePage/InvoicePage"));
+const ProfilePage = lazy(() => import("../Pages/Profile/Profile"));
+const PaymentManagement = lazy(() => import("../Pages/PaymentManagement/PaymentManagement"));
+const SalesReport = lazy(() => import("../Pages/SalesReport/SalesReport"));
+const AboutUs = lazy(() => import("../Pages/AboutUs/AboutUs"));
+const ContactUs = lazy(() => import("../Pages/ContactUs/ContactUs"));
+
+const SuspenseWrapper = ({ children }) => (
+  <Suspense fallback={<MedLoader />}>{children}</Suspense>
+);
 
 const router = createBrowserRouter([
   {
@@ -33,21 +42,29 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <SuspenseWrapper><Home /></SuspenseWrapper>,
       },
       {
         path: "/shop",
-        element: <Shop />,
+        element: <SuspenseWrapper><Shop /></SuspenseWrapper>,
+      },
+      {
+        path: "/about",
+        element: <SuspenseWrapper><AboutUs /></SuspenseWrapper>,
+      },
+      {
+        path: "/contact",
+        element: <SuspenseWrapper><ContactUs /></SuspenseWrapper>,
       },
       {
         path: "/profile",
-        element: <ProfilePage />,
+        element: <SuspenseWrapper><ProfilePage /></SuspenseWrapper>,
       },
       {
         path: "/cart",
         element: (
           <PrivateRouter>
-            <Cart />
+            <SuspenseWrapper><Cart /></SuspenseWrapper>
           </PrivateRouter>
         ),
       },
@@ -55,25 +72,25 @@ const router = createBrowserRouter([
         path: "/checkout",
         element: (
           <PrivateRouter>
-            <CheckoutPage />
+            <SuspenseWrapper><CheckoutPage /></SuspenseWrapper>
           </PrivateRouter>
         ),
       },
       {
         path: "/invoice",
         element: (
-            <PrivateRouter>
-              <InvoicePage />
-            </PrivateRouter>
+          <PrivateRouter>
+            <SuspenseWrapper><InvoicePage /></SuspenseWrapper>
+          </PrivateRouter>
         ),
       },
       {
         path: "/login",
-        element: <Login />,
+        element: <SuspenseWrapper><Login /></SuspenseWrapper>,
       },
       {
         path: "/register",
-        element: <Register />,
+        element: <SuspenseWrapper><Register /></SuspenseWrapper>,
       },
     ],
   },
@@ -85,12 +102,11 @@ const router = createBrowserRouter([
       </PrivateRouter>
     ),
     children: [
-      // admin only routes
       {
         path: "admin-home",
         element: (
           <AdminRoute>
-            <AdminHome />
+            <SuspenseWrapper><AdminHome /></SuspenseWrapper>
           </AdminRoute>
         ),
       },
@@ -98,7 +114,7 @@ const router = createBrowserRouter([
         path: "users",
         element: (
           <AdminRoute>
-            <AllUser />
+            <SuspenseWrapper><AllUser /></SuspenseWrapper>
           </AdminRoute>
         ),
       },
@@ -106,7 +122,7 @@ const router = createBrowserRouter([
         path: "category",
         element: (
           <AdminRoute>
-            <Categories />
+            <SuspenseWrapper><Categories /></SuspenseWrapper>
           </AdminRoute>
         ),
       },
@@ -114,7 +130,7 @@ const router = createBrowserRouter([
         path: "payment",
         element: (
           <AdminRoute>
-            <PaymentManagement />
+            <SuspenseWrapper><PaymentManagement /></SuspenseWrapper>
           </AdminRoute>
         ),
       },
@@ -122,7 +138,7 @@ const router = createBrowserRouter([
         path: "report",
         element: (
           <AdminRoute>
-            <UnderConstruction />
+            <SuspenseWrapper><SalesReport /></SuspenseWrapper>
           </AdminRoute>
         ),
       },
@@ -130,16 +146,15 @@ const router = createBrowserRouter([
         path: "ads-manager",
         element: (
           <AdminRoute>
-            <AdminAdsManager />
+            <SuspenseWrapper><AdminAdsManager /></SuspenseWrapper>
           </AdminRoute>
         ),
       },
-      // Seller only routes
       {
         path: "seller-home",
         element: (
           <SellerRoute>
-            <SellerHome />
+            <SuspenseWrapper><SellerHome /></SuspenseWrapper>
           </SellerRoute>
         ),
       },
@@ -147,7 +162,7 @@ const router = createBrowserRouter([
         path: "medicines",
         element: (
           <SellerRoute>
-            <SellerMedicinePage />
+            <SuspenseWrapper><SellerMedicinePage /></SuspenseWrapper>
           </SellerRoute>
         ),
       },
@@ -155,16 +170,16 @@ const router = createBrowserRouter([
         path: "add-ads",
         element: (
           <SellerRoute>
-            <SellerAdsManager />
+            <SuspenseWrapper><SellerAdsManager /></SuspenseWrapper>
           </SellerRoute>
         ),
       },
       {
         path: "payment-history",
         element: (
-            <PrivateRouter>
-              <PaymentHistory />
-            </PrivateRouter>
+          <PrivateRouter>
+            <SuspenseWrapper><PaymentHistory /></SuspenseWrapper>
+          </PrivateRouter>
         ),
       },
     ],

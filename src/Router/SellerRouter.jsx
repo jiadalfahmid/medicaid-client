@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import useSeller from "../hooks/useSeller";
+import MedLoader from "../Components/MedLoader/MedLoader";
 
 const SellerRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -8,7 +9,7 @@ const SellerRoute = ({ children }) => {
   const location = useLocation();
 
   if (loading || isSellerLoading) {
-    return <progress className="progress w-56"></progress>;
+    return <MedLoader />;
   }
 
   if (user && isSeller) {
