@@ -131,54 +131,54 @@ const SellerAdsManager = () => {
         </button>
       </div>
       {ads.length > 0 ? (
-        <div className="overflow-x-auto bg-base-100 rounded-lg">
-          <table className="min-w-full border border-gray-200">
-            <thead className="bg-accent text-white">
-              <tr>
-                <th className="border px-4 py-2">Image</th>
-                <th className="border px-4 py-2">Name</th>
-                <th className="border px-4 py-2">Description</th>
-                <th className="border px-4 py-2">Status</th>
-                <th className="border px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ads.map((ad) => (
-                <tr key={ad._id} className="text-center">
-                  <td className="border px-4 py-2">
-                    <img
-                      src={ad.image}
-                      alt={ad.name}
-                      className="mx-auto w-32 h-32 object-cover rounded"
-                    />
-                  </td>
-                  <td className="border px-4 py-2">{ad.name}</td>
-                  <td className="border px-4 py-2">{ad.description}</td>
-                  <td className="border px-4 py-2">
-                  <span
-                    className={`badge rounded-full text-sm ${
-                      ad.status === "approved"
-                        ? "bg-green-200 text-green-700"
-                        : ad.status === "rejected"
-                        ? "bg-red-200 text-red-700"
-                        : "bg-yellow-200 text-yellow-500"
-                    }`}
-                  >
-                    {ad.status}
-                  </span>
-                  </td>
-                  <td className="border px-4 py-2">
-                    <button
-                      onClick={() => handleDeleteAd(ad._id)}
-                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
+        <div className="bg-white rounded-2xl shadow-soft overflow-hidden border border-slate-100">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-600 border-b border-slate-100">
+                  <th className="px-6 py-4 font-semibold text-center w-24">Image</th>
+                  <th className="px-6 py-4 font-semibold">Name</th>
+                  <th className="px-6 py-4 font-semibold">Description</th>
+                  <th className="px-6 py-4 font-semibold text-center">Status</th>
+                  <th className="px-6 py-4 font-semibold text-center">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {ads.map((ad) => (
+                  <tr key={ad._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="bg-slate-100 rounded-xl p-2 w-14 h-14 mx-auto flex items-center justify-center">
+                        <img src={ad.image} alt={ad.name} className="max-h-full max-w-full object-contain rounded" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-slate-800">{ad.name}</td>
+                    <td className="px-6 py-4 text-slate-500 text-sm max-w-xs truncate">{ad.description}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                          ad.status === "approved"
+                            ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                            : ad.status === "rejected"
+                            ? "bg-red-100 text-red-700 border border-red-200"
+                            : "bg-amber-100 text-amber-700 border border-amber-200"
+                        }`}
+                      >
+                        {ad.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleDeleteAd(ad._id)}
+                        className="btn btn-sm btn-error text-white shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <p className="text-center text-gray-500">No advertisements found.</p>

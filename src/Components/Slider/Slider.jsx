@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useAxiosPublic from './../../Hooks/useAxiosPublic';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 
 const Slider = () => {
    const axiosPublic = useAxiosPublic();
@@ -25,9 +26,10 @@ const Slider = () => {
     fetchAds();
   }, []);
 
+  if (loading) return <div className="w-full h-[450px]"><SkeletonLoader type="chart" count={1} /></div>;
+
   return (
     <div className="carousel w-full max-h-[450px]">
-      {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       {ads.length > 0 ? (

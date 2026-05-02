@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
+import MedLoader from "../../Components/MedLoader/MedLoader";
+
 const AllUser = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,50 +83,52 @@ const AllUser = () => {
     });
   };
 
-  if (loading) return <div className="text-center">Loading...</div>;
-  if (error) return <div className="text-center text-red-500">{error}</div>;
+  if (loading) return <MedLoader />;
+  if (error) return <div className="text-center text-red-500 bg-red-50 p-4 rounded-xl">{error}</div>;
 
   return (
     <div className="px-6 py-4">
       <h1 className="text-2xl font-semibold mb-4">All Users</h1>
-      <div className="overflow-x-auto w-full">
-        <table className="table-auto w-full text-left border-collapse bg-base-100">
-          <thead>
-            <tr className="bg-primary text-white">
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Role</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id} className="border-b hover:bg-secondary">
-                <td className="px-4 py-2">{user.name}</td>
-                <td className="px-4 py-2">{user.email}</td>
-                <td className="px-4 py-2">
-                  <select
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                    className="p-2 border border-base-content rounded bg-background text-base-content"
-                  >
-                    <option value="user">User</option>
-                    <option value="seller">Seller</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </td>
-                <td className="px-4 py-2">
-                  <button
-                    onClick={() => handleDeleteUser(user._id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-                  >
-                    Delete
-                  </button>
-                </td>
+      <div className="bg-white rounded-2xl shadow-soft overflow-hidden border border-slate-100">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 text-slate-600 border-b border-slate-100">
+                <th className="px-6 py-4 font-semibold">Name</th>
+                <th className="px-6 py-4 font-semibold">Email</th>
+                <th className="px-6 py-4 font-semibold">Role</th>
+                <th className="px-6 py-4 font-semibold text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  <td className="px-6 py-4 font-medium text-slate-800">{user.name}</td>
+                  <td className="px-6 py-4 text-slate-500">{user.email}</td>
+                  <td className="px-6 py-4">
+                    <select
+                      value={user.role}
+                      onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                      className="p-2 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="user">User</option>
+                      <option value="seller">Seller</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={() => handleDeleteUser(user._id)}
+                      className="btn btn-sm btn-error text-white shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

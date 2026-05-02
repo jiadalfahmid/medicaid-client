@@ -3,6 +3,8 @@ import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import useAuth from "../../Hooks/useAuth";
 import { jsPDF } from "jspdf";
 
+import MedLoader from "../../Components/MedLoader/MedLoader";
+
 const InvoicePage = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
@@ -64,7 +66,7 @@ const InvoicePage = () => {
   };
 
   if (!invoice) {
-    return <p className="text-center text-gray-500 mt-10">Loading invoice...</p>;
+    return <MedLoader />;
   }
 
   return (
@@ -97,26 +99,30 @@ const InvoicePage = () => {
             </tr>
           </thead>
           <tbody>
-            {invoice.medicineItemNames?.map((name, idx) => (
-              <tr key={idx}>
-                <td className="p-2 border">{name}</td>
-                <td className="p-2 border text-center">{invoice.itemQuantities[idx]}</td>
-                <td className="p-2 border text-right">${invoice.itemPrices[idx].toFixed(2)}</td>
-                <td className="p-2 border text-right">
-                  ${(invoice.itemPrices[idx] * invoice.itemQuantities[idx]).toFixed(2)}
-                </td>
-              </tr>
-            ))}
+            {invoice.medicineItemNames?.map((name, idx) => {
+              const qty = invoice.itemQuantities?.[idx] || 1;
+              const price = invoice.itemPrices?.[idx] || 0;
+              return (
+                <tr key={idx}>
+                  <td className="p-2 border">{name}</td>
+                  <td className="p-2 border text-center">{qty}</td>
+                  <td className="p-2 border text-right">${price.toFixed(2)}</td>
+                  <td className="p-2 border text-right">
+                    ${(price * qty).toFixed(2)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
         {/* Summary */}
         <div className="text-right">
           <p className="text-lg font-semibold">
-            Discount: <span className="text-red-500">-${invoice.totalDiscount.toFixed(2)}</span>
+            Discount: <span className="text-red-500">-${(invoice.totalDiscount || 0).toFixed(2)}</span>
           </p>
           <p className="text-lg font-semibold">
-            Total: <span className="text-primary">${invoice.totalPrice.toFixed(2)}</span>
+            Total: <span className="text-primary">${(invoice.totalPrice || invoice.price || 0).toFixed(2)}</span>
           </p>
           <p className="text-sm text-gray-500">{new Date(invoice.date).toLocaleDateString()}</p>
         </div>

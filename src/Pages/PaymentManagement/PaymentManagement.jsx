@@ -79,43 +79,45 @@ const PaymentManagement = () => {
           </div>
 
           {/* Desktop View - Table */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full border-collapse border text-sm md:text-base">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="border p-2">Payment ID</th>
-                  <th className="border p-2">Email</th>
-                  <th className="border p-2">Amount</th>
-                  <th className="border p-2">Status</th>
-                  <th className="border p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map((payment) => (
-                  <tr key={payment._id} className="border hover:bg-gray-100">
-                    <td className="p-2">{payment._id}</td>
-                    <td className="p-2">{payment.email}</td>
-                    <td className="p-2 text-right">${payment.price}</td>
-                    <td className="p-2 text-center">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
-                        {payment.status}
-                      </span>
-                    </td>
-                    <td className="p-2 text-center">
-                      {payment.status === "pending" && (
-                        <button
-                          onClick={() => handleAcceptPayment(payment._id)}
-                          aria-label="Accept Payment"
-                          className="bg-primary hover:bg-accent text-white p-2 rounded-lg min-h-[44px]"
-                        >
-                          Accept Payment
-                        </button>
-                      )}
-                    </td>
+          <div className="hidden md:block bg-white rounded-2xl shadow-soft overflow-hidden border border-slate-100">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 text-slate-600 border-b border-slate-100">
+                    <th className="px-6 py-4 font-semibold">Payment ID</th>
+                    <th className="px-6 py-4 font-semibold">Email</th>
+                    <th className="px-6 py-4 font-semibold text-right">Amount</th>
+                    <th className="px-6 py-4 font-semibold text-center">Status</th>
+                    <th className="px-6 py-4 font-semibold text-center">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {payments.map((payment) => (
+                    <tr key={payment._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-slate-800">{payment._id}</td>
+                      <td className="px-6 py-4 text-slate-500">{payment.email}</td>
+                      <td className="px-6 py-4 text-right font-semibold text-primary">${payment.price}</td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${payment.status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {payment.status === "pending" && (
+                          <button
+                            onClick={() => handleAcceptPayment(payment._id)}
+                            aria-label="Accept Payment"
+                            className="btn btn-sm btn-primary text-white shadow-sm hover:shadow-md transition-shadow"
+                          >
+                            Accept
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

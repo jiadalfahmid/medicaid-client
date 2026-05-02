@@ -128,42 +128,46 @@ const Categories = () => {
       {categories.length === 0 ? (
         <EmptyState message="No Categories Found" subMessage="Click the + Add Category button to create one." />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-primary text-white text-center">
-                <th className="border px-4 py-2">Image</th>
-                <th className="border px-4 py-2">Category Name</th>
-                <th className="border px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((category) => (
-                <tr key={category._id} className="border">
-                  <td className="border px-4 py-2">
-                    <img src={category.categoryImage} alt={category.categoryName} loading="lazy" className="h-12 w-12 object-cover rounded mx-auto" />
-                  </td>
-                  <td className="border px-4 py-2">{category.categoryName}</td>
-                  <td className="border px-4 py-2 flex gap-2 justify-center">
-                    <button
-                      onClick={() => handleUpdateCategory(category)}
-                      aria-label={`Edit ${category.categoryName}`}
-                      className="bg-primary hover:bg-accent text-white px-4 py-2 rounded min-h-[44px] min-w-[44px]"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCategory(category._id)}
-                      aria-label={`Delete ${category.categoryName}`}
-                      className="btn btn-error text-white px-4 py-2 rounded min-h-[44px] min-w-[44px]"
-                    >
-                      Delete
-                    </button>
-                  </td>
+        <div className="bg-white rounded-2xl shadow-soft overflow-hidden border border-slate-100">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-600 border-b border-slate-100">
+                  <th className="px-6 py-4 font-semibold text-center w-24">Image</th>
+                  <th className="px-6 py-4 font-semibold">Category Name</th>
+                  <th className="px-6 py-4 font-semibold text-center">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {categories.map((category) => (
+                  <tr key={category._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="bg-slate-100 rounded-xl p-2 w-14 h-14 mx-auto flex items-center justify-center">
+                        <img src={category.categoryImage} alt={category.categoryName} loading="lazy" className="max-h-full max-w-full object-contain" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-slate-800">{category.categoryName}</td>
+                    <td className="px-6 py-4 flex gap-2 justify-center">
+                      <button
+                        onClick={() => handleUpdateCategory(category)}
+                        aria-label={`Edit ${category.categoryName}`}
+                        className="btn btn-sm bg-slate-100 hover:bg-slate-200 text-slate-700 border-none transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCategory(category._id)}
+                        aria-label={`Delete ${category.categoryName}`}
+                        className="btn btn-sm btn-error text-white shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

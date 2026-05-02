@@ -25,7 +25,7 @@ const Shop = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cart, setCart] = useState([]);
-  const limit = 10;
+  const limit = 12;
 
 
   useEffect(() => {
@@ -232,61 +232,64 @@ const Shop = () => {
       {error && <EmptyState message="Error fetching products" subMessage="Please try again later." />}
 
       {!isLoading && products?.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse border text-sm md:text-base">
-            <thead>
-              <tr className="bg-secondary">
-                <th className="border p-2">Image</th>
-                <th className="border p-2">Name</th>
-                <th className="border p-2">Category</th>
-                <th className="border p-2">Price Per Unit</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product?._id} className="border hover:bg-secondary">
-                  <td className="p-2 flex justify-center items-center">
-                    <img
-                      src={product?.image}
-                      alt={product?.medicineName}
-                      loading="lazy"
-                      className="w-32 h-32 object-cover rounded-md relative"
-                    />
-                    {Number(product?.discountPercentage) > 0 && (
-                      <span className="bg-blue-200 text-blue-500 px-2 py-1 badge badge-lg absolute  mb-24 mr-16">
-                        {product?.discountPercentage}% OFF
-                      </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <div key={product?._id} className="card bg-white shadow-soft hover:shadow-hover border border-slate-100 transition-all duration-300 rounded-3xl overflow-hidden group">
+              {Number(product?.discountPercentage) > 0 && (
+                <div className="absolute top-4 right-4 z-10">
+                  <span className="badge badge-error text-white font-bold px-3 py-3 rounded-full shadow-lg border-2 border-white">
+                    -{product?.discountPercentage}%
+                  </span>
+                </div>
+              )}
+              <figure className="h-48 bg-slate-50 relative overflow-hidden p-6 cursor-pointer" onClick={() => handleViewDetails(product)}>
+                <img
+                  src={product?.image}
+                  alt={product?.medicineName}
+                  loading="lazy"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                />
+              </figure>
+              <div className="card-body p-6">
+                <h3 className="text-lg font-bold text-slate-800 leading-tight mb-1 truncate cursor-pointer hover:text-primary" onClick={() => handleViewDetails(product)}>
+                  {product?.medicineName} {product?.massUnitValue}{product?.itemMassUnit}
+                </h3>
+                <p className="text-xs text-slate-500 mb-4">{product?.category}</p>
+                <div className="flex justify-between items-end mt-auto pt-4 border-t border-slate-50">
+                  <div>
+                    {Number(product?.discountPercentage) > 0 ? (
+                      <>
+                        <p className="text-xs text-slate-400 line-through mb-1">${Number(product?.fullStripPrice).toFixed(2)}</p>
+                        <p className="text-xl font-bold text-primary">
+                          ${(Number(product?.fullStripPrice) - (Number(product?.fullStripPrice) * (Number(product?.discountPercentage) / 100))).toFixed(2)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xl font-bold text-primary">
+                        ${Number(product?.perUnitPrice).toFixed(2)} <span className="text-xs text-slate-400 font-normal">/ unit</span>
+                      </p>
                     )}
-                  </td>
-                  <td className="p-2 border">
-                    {product?.medicineName} {product?.massUnitValue}{" "}
-                    {product?.itemMassUnit}
-                  </td>
-                  <td className="p-2 border">{product?.category}</td>
-                  <td className="p-2 text-right lg:pr-8">
-                    ${Number(product?.perUnitPrice).toFixed(2)}
-                  </td>
-                  <td className="space-x-2">
+                  </div>
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleViewDetails(product)}
                       aria-label={`View details of ${product?.medicineName}`}
-                      className="min-w-[44px] min-h-[44px] bg-primary hover:bg-accent text-white p-2 rounded-lg"
+                      className="btn btn-circle btn-ghost btn-sm bg-slate-50 hover:bg-slate-200 text-slate-600 transition-colors"
                     >
-                      <IoEyeOutline className="w-5 h-5 mx-auto" />
+                      <IoEyeOutline size={16} />
                     </button>
                     <button
                       onClick={() => handleAddToCart(product)}
                       aria-label={`Add ${product?.medicineName} to cart`}
-                      className="min-w-[44px] min-h-[44px] bg-primary hover:bg-accent text-white p-2 rounded-lg"
+                      className="btn btn-circle btn-primary btn-sm text-white shadow-md hover:scale-110 transition-transform"
                     >
-                      <IoCartOutline className="w-5 h-5 mx-auto" />
+                      <IoCartOutline size={16} />
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : !isLoading ? (
         <EmptyState 

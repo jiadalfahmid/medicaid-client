@@ -4,6 +4,7 @@ import DashboardNavbar from '../../Components/DashboardNavbar/DashboardNavbar';
 import axios from 'axios';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import useAuth from './../../Hooks/useAuth';
+import MedLoader from '../../Components/MedLoader/MedLoader';
 
 const Dashboard = () => {
   const [userRole, setUserRole] = useState('');
@@ -29,7 +30,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen"><MedLoader /></div>;
   }
 
   if (error) {

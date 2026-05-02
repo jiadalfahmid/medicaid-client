@@ -164,37 +164,44 @@ const SalesReport = () => {
       {isLoading ? (
         <p>Loading sales report...</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse border border-base-300">
-            <thead>
-              <tr className="bg-primary text-white font-semibold">
-                <th className="border border-base-300 p-3">Transaction ID</th>
-                <th className="border border-base-300 p-3">Buyer Email</th>
-                <th className="border border-base-300 p-3">Date</th>
-                <th className="border border-base-300 p-3">Status</th>
-                <th className="border border-base-300 p-3">Total Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPayments.length > 0 ? (
-                filteredPayments.map((payment) => (
-                  <tr key={payment._id || payment.transactionId} className="border border-base-300 hover:bg-secondary">
-                    <td className="border border-base-300 p-3">{payment.transactionId}</td>
-                    <td className="border border-base-300 p-3">{payment.email}</td>
-                    <td className="border border-base-300 p-3">{new Date(payment.date).toLocaleDateString()}</td>
-                    <td className="border border-base-300 p-3 capitalize">{payment.status}</td>
-                    <td className="border border-base-300 p-3 text-right">${payment.price}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center text-gray-500 p-4">
-                    No sales found for the selected dates.
-                  </td>
+        <div className="bg-white rounded-2xl shadow-soft overflow-hidden border border-slate-100">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-600 border-b border-slate-100">
+                  <th className="px-6 py-4 font-semibold">Transaction ID</th>
+                  <th className="px-6 py-4 font-semibold">Buyer Email</th>
+                  <th className="px-6 py-4 font-semibold">Date</th>
+                  <th className="px-6 py-4 font-semibold">Status</th>
+                  <th className="px-6 py-4 font-semibold text-right">Total Price</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredPayments.length > 0 ? (
+                  filteredPayments.map((payment) => (
+                    <tr key={payment._id || payment.transactionId} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-slate-800">{payment.transactionId}</td>
+                      <td className="px-6 py-4 text-slate-500">{payment.email}</td>
+                      <td className="px-6 py-4 text-slate-500">{new Date(payment.date).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 capitalize">
+                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${payment.status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right font-semibold text-primary">${payment.price}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center text-slate-500 py-12">
+                      <p className="text-lg font-medium">No sales found</p>
+                      <p className="text-sm">Try adjusting your date range.</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

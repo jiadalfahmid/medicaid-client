@@ -29,6 +29,8 @@ const PaymentManagement = lazy(() => import("../Pages/PaymentManagement/PaymentM
 const SalesReport = lazy(() => import("../Pages/SalesReport/SalesReport"));
 const AboutUs = lazy(() => import("../Pages/AboutUs/AboutUs"));
 const ContactUs = lazy(() => import("../Pages/ContactUs/ContactUs"));
+const PrivacyPolicy = lazy(() => import("../Pages/Legal/PrivacyPolicy"));
+const RefundPolicy = lazy(() => import("../Pages/Legal/RefundPolicy"));
 
 const SuspenseWrapper = ({ children }) => (
   <Suspense fallback={<MedLoader />}>{children}</Suspense>
@@ -59,6 +61,14 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <SuspenseWrapper><ProfilePage /></SuspenseWrapper>,
+      },
+      {
+        path: "/privacy-policy",
+        element: <SuspenseWrapper><PrivacyPolicy /></SuspenseWrapper>,
+      },
+      {
+        path: "/refund-policy",
+        element: <SuspenseWrapper><RefundPolicy /></SuspenseWrapper>,
       },
       {
         path: "/cart",
