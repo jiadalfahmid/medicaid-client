@@ -197,11 +197,11 @@ const Shop = () => {
           type="text"
           placeholder="Search products..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="border p-2 flex-1"
         />
         <select
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => { setCategory(e.target.value); setPage(1); }}
           className="border p-2 border-r-8 border-r-transparent"
         >
           <option value="">All Categories</option>
@@ -213,7 +213,7 @@ const Shop = () => {
         </select>
         <select
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
+          onChange={(e) => { setSort(e.target.value); setPage(1); }}
           className="border p-2 border-r-8 border-r-transparent"
         >
           <option value="asc">Price: Low to High</option>
@@ -234,7 +234,7 @@ const Shop = () => {
       {!isLoading && products?.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
-            <div key={product?._id} className="card bg-white shadow-soft hover:shadow-hover border border-slate-100 transition-all duration-300 rounded-3xl overflow-hidden group">
+            <div key={product?._id} className="card relative bg-white shadow-soft hover:shadow-hover border border-slate-100 transition-all duration-300 rounded-3xl overflow-hidden group">
               {Number(product?.discountPercentage) > 0 && (
                 <div className="absolute top-4 right-4 z-10">
                   <span className="badge badge-error text-white font-bold px-3 py-3 rounded-full shadow-lg border-2 border-white">
@@ -296,7 +296,7 @@ const Shop = () => {
           message="No products found" 
           subMessage="Try adjusting your filters or search query." 
           actionText="Clear Filters" 
-          onAction={() => { setSearch(""); setCategory(""); setSort("asc"); }} 
+          onAction={() => { setSearch(""); setCategory(""); setSort("asc"); setPage(1); }} 
         />
       ) : null}
 

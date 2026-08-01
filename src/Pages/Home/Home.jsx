@@ -82,14 +82,9 @@ const Home = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-800 mb-3 tracking-tight">Shop by Category</h2>
-              <p className="text-slate-500 max-w-2xl text-balance">Browse our wide selection of medicines organized by categories for your convenience.</p>
-            </div>
-            <Link to="/shop" className="text-primary font-semibold flex items-center gap-1 hover:underline underline-offset-4">
-              View All Categories <ArrowRight size={16} />
-            </Link>
+          <div className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-800 mb-3 tracking-tight">Shop by Category</h2>
+            <p className="text-slate-500 max-w-2xl text-balance">Browse our wide selection of medicines organized by categories for your convenience.</p>
           </div>
           <CategoryCards/>
         </motion.section>

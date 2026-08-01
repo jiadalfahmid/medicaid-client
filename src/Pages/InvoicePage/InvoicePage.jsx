@@ -44,18 +44,20 @@ const InvoicePage = () => {
 
     y += 10;
     invoice.medicineItemNames?.forEach((name, idx) => {
+      const qty = invoice.itemQuantities?.[idx] || 1;
+      const price = invoice.itemPrices?.[idx] || 0;
       doc.text(name, 20, y);
-      doc.text(`${invoice.itemQuantities[idx]}`, 80, y);
-      doc.text(`$${invoice.itemPrices[idx].toFixed(2)}`, 120, y);
-      doc.text(`$${(invoice.itemPrices[idx] * invoice.itemQuantities[idx]).toFixed(2)}`, 160, y);
+      doc.text(`${qty}`, 80, y);
+      doc.text(`$${price.toFixed(2)}`, 120, y);
+      doc.text(`$${(price * qty).toFixed(2)}`, 160, y);
       y += 10;
     });
 
     // Summary
     y += 10;
-    doc.text(`Discount: -$${invoice.totalDiscount.toFixed(2)}`, 120, y);
+    doc.text(`Discount: -$${(invoice.totalDiscount || 0).toFixed(2)}`, 120, y);
     y += 10;
-    doc.text(`Total: $${invoice.totalPrice.toFixed(2)}`, 120, y);
+    doc.text(`Total: $${(invoice.totalPrice || invoice.price || 0).toFixed(2)}`, 120, y);
 
     // Date
     y += 10;

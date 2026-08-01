@@ -10,7 +10,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const [role, setRole] = useState(null);
   const navigate = useNavigate();
-  const { cart, cartCount, cartTotal, updateCart } = useCart();
+  const { cart, cartCount, cartTotal, updateCart, fetchAndSyncCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -30,16 +30,10 @@ const Navbar = () => {
     }
   };
 
+  // A4: Sync cart + role whenever user changes
   useEffect(() => {
-    if (user && user.email) {
-      const fetchCart = async () => {
-        const response = await axiosSecure.get(`/cart/${user.email}`);
-        const cartItems = response.data;
-        updateCart(cartItems);
-      };
-
-      fetchCart();
-
+    if (user?.email) {
+      fetchAndSyncCart(user.email);
       const fetchUserRole = async () => {
         try {
           const response = await axiosSecure.get(`/users/${user.email}`);
@@ -49,8 +43,11 @@ const Navbar = () => {
         }
       };
       fetchUserRole();
+    } else {
+      updateCart([]);
+      setRole(null);
     }
-  }, [user, updateCart]);
+  }, [user]);
 
   const links = (
     <>
@@ -162,16 +159,30 @@ const Navbar = () => {
               className="card card-compact dropdown-content bg-white z-50 mt-4 w-64 shadow-hover border border-slate-100 rounded-2xl"
             >
               <div className="card-body">
-                <h4 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">{cartCount} Items in Cart</h4>
-                <div className="flex justify-between items-center py-2 text-slate-600">
-                  <span>Subtotal:</span>
-                  <span className="font-bold text-primary">${cartTotal}</span>
-                </div>
-                <div className="card-actions mt-2">
-                  <Link to="/cart" className="btn btn-primary btn-block rounded-xl shadow-md shadow-primary/20">
-                    View Cart
-                  </Link>
-                </div>
+                {user ? (
+                  <>
+                    <h4 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">{cartCount} Items in Cart</h4>
+                    <div className="flex justify-between items-center py-2 text-slate-600">
+                      <span>Subtotal:</span>
+                      <span className="font-bold text-primary">${cartTotal}</span>
+                    </div>
+                    <div className="card-actions mt-2">
+                      <Link to="/cart" className="btn btn-primary btn-block rounded-xl shadow-md shadow-primary/20">
+                        View Cart
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h4 className="text-lg font-bold text-slate-800 border-b border-slate-100 pb-2">Your Cart</h4>
+                    <p className="text-sm text-slate-500 py-2">Please log in to view your cart and checkout.</p>
+                    <div className="card-actions mt-2">
+                      <Link to="/login" className="btn btn-primary btn-block rounded-xl shadow-md shadow-primary/20">
+                        Login to Shop
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -194,11 +205,16 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* Profile / Join Us Button */}
+          {/* A3: Login + Join Us for guests */}
           {!user ? (
-            <Link to="/register" className="btn btn-primary text-white ml-2 rounded-full px-6 shadow-md shadow-primary/20 hover:-translate-y-0.5 transition-transform">
-              Join Us
-            </Link>
+            <div className="flex items-center gap-2 ml-2">
+              <Link to="/login" className="btn btn-ghost border border-slate-200 hover:border-primary hover:text-primary rounded-full px-5 text-slate-700 transition-all">
+                Login
+              </Link>
+              <Link to="/register" className="btn btn-primary text-white rounded-full px-5 shadow-md shadow-primary/20 hover:-translate-y-0.5 transition-transform">
+                Join Us
+              </Link>
+            </div>
           ) : (
             <div className="dropdown dropdown-end ml-2">
               <div

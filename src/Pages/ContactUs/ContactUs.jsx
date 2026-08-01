@@ -1,8 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const ContactUs = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    toast.success("Message sent! We'll get back to you within 24 hours.");
+    e.target.reset();
+  };
+
   return (
     <div className="min-h-screen bg-background py-20 px-4">
       <div className="container mx-auto max-w-5xl">
@@ -43,7 +50,7 @@ const ContactUs = () => {
           transition={{ delay: 0.4 }}
           className="bg-white rounded-3xl shadow-xl p-8 max-w-3xl mx-auto"
         >
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Name</label>
@@ -58,7 +65,7 @@ const ContactUs = () => {
               <label className="block text-sm font-medium text-slate-700 mb-2">Message</label>
               <textarea rows="5" className="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="How can we help?"></textarea>
             </div>
-            <button type="button" className="btn btn-primary w-full text-white rounded-xl shadow-lg shadow-primary/30">
+            <button type="submit" className="btn btn-primary w-full text-white rounded-xl shadow-lg shadow-primary/30">
               Send Message
             </button>
           </form>

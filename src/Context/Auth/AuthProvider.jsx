@@ -66,7 +66,8 @@ const AuthProvider = ({ children }) => {
         name: result.user?.displayName,
         role: "user",
       };
-      await axios.post(`${import.meta.env.VITE_API_BASE}/users`, userInfo).then((result) => {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      await axios.post(`${apiUrl}/users`, userInfo).then((result) => {
         setSuccess("Google sign-in successful!");
       });
     } catch (err) {
@@ -124,8 +125,9 @@ const AuthProvider = ({ children }) => {
           const { email } = currentUser;
 
           // Request JWT Token from Backend
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
           const { data } = await axios.post(
-            `${import.meta.env.VITE_API_BASE}/jwt`,
+            `${apiUrl}/jwt`,
             { email }
           );
 

@@ -2,6 +2,7 @@ import React from "react";
 import useAuth from "../../Hooks/useAuth"; 
 import { motion } from "framer-motion";
 import { User, Mail, Calendar, Activity, ShoppingBag, ShieldCheck, Star } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ProfilePage = () => {
   const { user } = useAuth();
@@ -75,7 +76,9 @@ const ProfilePage = () => {
         </div>
         
         <div className="z-10">
-          <button className="btn btn-primary text-white rounded-full px-8 shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
+          <button 
+            onClick={() => toast("Edit Profile feature coming soon!", { icon: "🔧" })}
+            className="btn btn-primary text-white rounded-full px-8 shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
             Edit Profile
           </button>
         </div>
@@ -138,7 +141,9 @@ const ProfilePage = () => {
           ))}
         </div>
         
-        <button className="w-full mt-6 py-3 text-primary font-medium hover:bg-slate-50 rounded-xl transition-colors">
+        <button 
+          onClick={() => toast("Full activity history coming soon!", { icon: "📋" })}
+          className="w-full mt-6 py-3 text-primary font-medium hover:bg-slate-50 rounded-xl transition-colors">
           View All Activity
         </button>
       </motion.div>

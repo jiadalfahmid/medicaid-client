@@ -106,17 +106,20 @@ const SellerAdsManager = () => {
   };
 
   const handleAddAdvertisement = async (image, description, name) => {
-    toast.success("Advertisement added successfully!");
-    location.reload();
-    const response = await axiosSecure.post(`/ads`, {
-      sellerEmail: user.email,
-      name,
-      image,
-      description,
-      status: "pending",
-    });
-
-    setAds((prevAds) => [...prevAds, response.data]);
+    try {
+      const response = await axiosSecure.post(`/ads`, {
+        sellerEmail: user.email,
+        name,
+        image,
+        description,
+        status: "pending",
+      });
+      setAds((prevAds) => [...prevAds, response.data]);
+      toast.success("Advertisement added successfully!");
+    } catch (error) {
+      console.error("Error adding advertisement:", error);
+      toast.error("Failed to add advertisement.");
+    }
   };
 
   return (

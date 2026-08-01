@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+import MedLoader from "../../Components/MedLoader/MedLoader";
+
 
 const SalesReport = () => {
   const axiosSecure = useAxiosSecure();
@@ -61,7 +63,7 @@ const SalesReport = () => {
     filteredPayments.forEach((payment) => {
       const paymentData = [
         payment.transactionId,
-        payment.email,
+        payment.userEmail,
         new Date(payment.date).toLocaleDateString(),
         payment.status,
         `$${payment.price}`
@@ -83,7 +85,7 @@ const SalesReport = () => {
     const headers = ["Transaction ID", "Buyer Email", "Date", "Status", "Total Price"];
     const rows = filteredPayments.map(payment => [
       payment.transactionId,
-      payment.email,
+      payment.userEmail,
       new Date(payment.date).toLocaleDateString(),
       payment.status,
       payment.price
@@ -162,7 +164,7 @@ const SalesReport = () => {
 
       {/* Data Table */}
       {isLoading ? (
-        <p>Loading sales report...</p>
+      <MedLoader />
       ) : (
         <div className="bg-white rounded-2xl shadow-soft overflow-hidden border border-slate-100">
           <div className="overflow-x-auto w-full">
@@ -181,7 +183,7 @@ const SalesReport = () => {
                   filteredPayments.map((payment) => (
                     <tr key={payment._id || payment.transactionId} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                       <td className="px-6 py-4 font-medium text-slate-800">{payment.transactionId}</td>
-                      <td className="px-6 py-4 text-slate-500">{payment.email}</td>
+                      <td className="px-6 py-4 text-slate-500">{payment.userEmail}</td>
                       <td className="px-6 py-4 text-slate-500">{new Date(payment.date).toLocaleDateString()}</td>
                       <td className="px-6 py-4 capitalize">
                         <span className={`px-3 py-1 text-xs font-semibold rounded-full ${payment.status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>

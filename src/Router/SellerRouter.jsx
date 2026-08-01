@@ -8,7 +8,7 @@ const SellerRoute = ({ children }) => {
   const [isSeller, isSellerLoading] = useSeller();
   const location = useLocation();
 
-  if (loading || isSellerLoading) {
+  if (loading || (user && isSellerLoading)) {
     return <MedLoader />;
   }
 
@@ -16,7 +16,7 @@ const SellerRoute = ({ children }) => {
     return children;
   }
 
-  return <Navigate to="/" state={{ from: location }} replace></Navigate>;
+  return <Navigate to="/login" state={{ from: location }} replace></Navigate>;
 };
 
 export default SellerRoute;

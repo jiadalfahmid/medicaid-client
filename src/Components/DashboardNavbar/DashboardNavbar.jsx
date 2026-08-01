@@ -82,33 +82,34 @@ const DashboardNavbar = ({ role }) => {
 
           {/* Render Dynamic Menu */}
           <ul className="flex flex-col gap-1.5 w-full">
-            {menuItems[role]?.map((item, index) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <li key={index} className="w-full relative">
-                  <NavLink
-                    to={item.path}
-                    className={({ isActive }) => `
-                      flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium
-                      ${isActive 
-                        ? "bg-primary text-white shadow-md shadow-primary/20" 
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}
-                    `}
-                  >
-                    {item.icon}
-                    <span>{item.name}</span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute left-0 w-1 h-full bg-white rounded-r-full"
-                        initial={false}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
-                  </NavLink>
-                </li>
-              );
-            })}
+            {menuItems[role]?.map((item, index) => (
+              <li key={index} className="w-full relative">
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) => `
+                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium
+                    ${isActive 
+                      ? "bg-primary text-white shadow-md shadow-primary/20" 
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}
+                  `}
+                >
+                  {({ isActive }) => (
+                    <>
+                      {item.icon}
+                      <span>{item.name}</span>
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeTab"
+                          className="absolute left-0 top-0 w-1 h-full bg-white rounded-r-full"
+                          initial={false}
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            ))}
           </ul>
 
         </div>

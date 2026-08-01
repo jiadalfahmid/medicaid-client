@@ -44,7 +44,7 @@ const AllUser = () => {
           if (response.status === 200) {
             Swal.fire({
               title: "Success!",
-              text: "Item has been deleted.",
+              text: "Role updated successfully.",
               icon: "success",
               confirmButtonColor: "#00bfff",
             });

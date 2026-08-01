@@ -3,9 +3,11 @@ import useAuth from '../../Hooks/useAuth';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Package, DollarSign, Star, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const SellerHome = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   // Mocking seller stats for demonstration of industrial UI
   const stats = { revenue: 1250.50, itemsSold: 45, rating: 4.8 };
@@ -38,7 +40,9 @@ const SellerHome = () => {
           <h1 className="text-3xl font-bold text-slate-800">Seller Dashboard</h1>
           <p className="text-slate-500">Manage your store and track sales, {user?.displayName}</p>
         </div>
-        <button className="btn btn-primary text-white shadow-lg shadow-primary/30">
+        <button 
+          onClick={() => navigate('/dashboard/medicines')}
+          className="btn btn-primary text-white shadow-lg shadow-primary/30">
           Add New Product
         </button>
       </div>

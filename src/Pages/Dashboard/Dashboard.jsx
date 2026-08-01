@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import DashboardNavbar from '../../Components/DashboardNavbar/DashboardNavbar';
-import axios from 'axios';
 import useAxiosSecure from '../../Hooks/useAxiosSecure';
 import useAuth from './../../Hooks/useAuth';
 import MedLoader from '../../Components/MedLoader/MedLoader';

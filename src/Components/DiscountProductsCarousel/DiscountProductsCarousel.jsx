@@ -43,7 +43,7 @@ const DiscountProductsCarousel = () => {
     <div className="carousel carousel-center w-full space-x-6 pb-8">
       {medicines.map((medicine) => (
         <div className="carousel-item" key={medicine._id}>
-          <div className="card w-72 bg-white shadow-soft hover:shadow-hover border border-slate-100 transition-all duration-300 rounded-3xl overflow-hidden group">
+          <div className="card relative w-72 bg-white shadow-soft hover:shadow-hover border border-slate-100 transition-all duration-300 rounded-3xl overflow-hidden group">
             {/* Discount Badge */}
             <div className="absolute top-4 right-4 z-10">
               <span className="badge badge-error text-white font-bold px-3 py-3 rounded-full shadow-lg border-2 border-white">

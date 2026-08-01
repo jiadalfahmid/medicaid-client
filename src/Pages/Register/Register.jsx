@@ -98,6 +98,7 @@ const Register = () => {
       <div className="card bg-base-100 w-full max-w-md shadow-xl rounded-lg">
         <form onSubmit={handleSubmit} className="card-body p-6">
           <button
+            type="button"
             onClick={signUpWithGoogle}
             className="btn btn-outline text-primary border-primary w-full hover:bg-primary hover:text-white"
             disabled={loading}

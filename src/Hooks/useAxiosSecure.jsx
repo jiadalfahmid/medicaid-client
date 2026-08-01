@@ -3,13 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useAuth from "./useAuth";
 
+import Swal from "sweetalert2";
+
+const apiUrl = import.meta.env.VITE_API_URL;
+if (!apiUrl) {
+  console.warn("VITE_API_URL is undefined; falling back to http://localhost:5000");
+}
+
+let isAlertShowing = false;
+
 const axiosSecure = axios.create({
-  baseURL: `${import.meta.env.VITE_API_BASE}`
+  baseURL: apiUrl || "http://localhost:5000"
 });
 
 const useAxiosSecure = () => {
   const navigate = useNavigate();
-  const { logOut } = useAuth();
+  const { logout } = useAuth();
 
   useEffect(() => {
     // Request Interceptor - Adds the token to every request
@@ -29,8 +38,20 @@ const useAxiosSecure = () => {
       (response) => response,
       async (error) => {
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-          await logOut();
+          localStorage.removeItem("accessToken");
+          await logout();
           navigate("/login");
+        } else if (error.message === "Network Error" || (error.response && error.response.status >= 500)) {
+          if (!isAlertShowing) {
+            isAlertShowing = true;
+            Swal.fire({
+              icon: "error",
+              title: "Connection Error",
+              text: "Unable to connect to the server. Please try again later.",
+            }).then(() => {
+              isAlertShowing = false;
+            });
+          }
         }
         return Promise.reject(error);
       }
@@ -41,7 +62,7 @@ const useAxiosSecure = () => {
       axiosSecure.interceptors.request.eject(requestInterceptor);
       axiosSecure.interceptors.response.eject(responseInterceptor);
     };
-  }, [navigate, logOut]);
+  }, [navigate, logout]);
 
   return axiosSecure;
 };

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import axios from "axios";
 import useAxiosSecure from './../../Hooks/useAxiosSecure';
 import MedLoader from "../../Components/MedLoader/MedLoader";
 
@@ -63,7 +62,7 @@ const PaymentManagement = () => {
                     {payment.status}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mb-1"><span className="font-medium">Email:</span> {payment.email}</p>
+                <p className="text-sm text-gray-600 mb-1"><span className="font-medium">Email:</span> {payment.userEmail}</p>
                 <p className="text-sm text-gray-600 mb-3"><span className="font-medium">Amount:</span> ${payment.price}</p>
                 {payment.status === "pending" && (
                   <button
@@ -95,7 +94,7 @@ const PaymentManagement = () => {
                   {payments.map((payment) => (
                     <tr key={payment._id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                       <td className="px-6 py-4 font-medium text-slate-800">{payment._id}</td>
-                      <td className="px-6 py-4 text-slate-500">{payment.email}</td>
+                      <td className="px-6 py-4 text-slate-500">{payment.userEmail}</td>
                       <td className="px-6 py-4 text-right font-semibold text-primary">${payment.price}</td>
                       <td className="px-6 py-4 text-center">
                         <span className={`px-3 py-1 text-xs font-semibold rounded-full ${payment.status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>

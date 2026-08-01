@@ -30,20 +30,20 @@ const CheckoutForm = () => {
   const [clientSecret, setClientSecret] = useState("");
   const [transactionId, setTransactionId] = useState("");
 
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+  const totalPrice = cart?.reduce(
+    (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
     0
-  );
-  const totalDiscount = cart.reduce(
+  ) || 0;
+  const totalDiscount = cart?.reduce(
     (sum, item) =>
       sum +
       (item.discountPercentage
-        ? (item.price * item.quantity * item.discountPercentage) / 100
+        ? ((item.price || 0) * (item.quantity || 1) * item.discountPercentage) / 100
         : 0),
     0
-  );
+  ) || 0;
   const finalTotal = totalPrice - totalDiscount;
-  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalQuantity = cart?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
 
   useEffect(() => {
     if (finalTotal > 0) {
@@ -107,7 +107,7 @@ const CheckoutForm = () => {
 
         const paymentData = {
           userEmail: user.email,
-          sellerEmail: cart.sellerEmail,
+          sellerEmail: cart[0]?.sellerEmail || "",
           price: finalTotal,
           quantity: totalQuantity,
           transactionId: paymentIntent.id,

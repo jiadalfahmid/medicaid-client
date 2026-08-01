@@ -3,7 +3,7 @@ import { lazy, Suspense } from "react";
 import MedLoader from "../Components/MedLoader/MedLoader";
 
 import Root from "../Pages/Root/Root";
-import ErrorPage from "./../Pages/ErrorPage.jsx/ErrorPage";
+import ErrorPage from "./../Pages/ErrorPage/ErrorPage";
 import AdminRoute from "./AdminRouter";
 import PrivateRouter from "./PrivateRouter";
 import SellerRoute from "./SellerRouter";
